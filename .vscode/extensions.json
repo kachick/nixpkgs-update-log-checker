@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "github.vscode-github-actions",
+    "rust-lang.rust-analyzer",
+    "editorconfig.editorconfig",
+    "tekumara.typos-vscode",
+    "dprint.dprint",
+    "jnoortheen.nix-ide"
+  ]
+}
