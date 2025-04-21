@@ -7,10 +7,12 @@ on:
     paths:
       - '**'
       - '!**.md'
+      - '!.vscode'
   pull_request:
     paths:
       - '**'
       - '!**.md'
+      - '!.vscode'
   schedule:
     # Every 10:42 JST
     # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
