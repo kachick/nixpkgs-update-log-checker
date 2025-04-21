@@ -45,7 +45,7 @@ impl std::fmt::Display for PackageCheckResult {
 
 // Returns all log URLs for a package, and sorted with LIFO order.
 fn get_log_urls(raw_log_urls: &str, list_url: &Url) -> Result<Vec<String>> {
-    let html = Html::parse_document(&raw_log_urls);
+    let html = Html::parse_document(raw_log_urls);
     let anchor =
         Selector::parse("a").map_err(|e| anyhow::anyhow!("Failed to parse selector 'a': {}", e))?;
 
