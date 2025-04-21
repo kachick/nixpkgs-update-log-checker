@@ -20,7 +20,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     ];
   };
 
-  cargoHash = "sha256-OySm6axg4Dnk4uKhEX+80YfOBMxawtX71SJNuk8rsQM=";
+  cargoHash = "sha256-fjnkvV+kQVXZ5J1vVx9r4nY6d6aPD8ASZtB0ulhh7ko=";
 
   nativeInstallCheckInputs = [
     versionCheckHook
