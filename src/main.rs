@@ -17,11 +17,20 @@ async fn main() -> Result<()> {
     )
     .await;
 
-    for (pkg, result) in packages.iter().zip(results) {
+    for (pkg, result) in packages.iter().zip(results.iter()) {
         match result {
             Ok(res) => println!("{}: {}", pkg, res),
             Err(_) => println!("\x1b[31m[ERROR]\x1b[0m {}: Unknown error to analyze", pkg),
         }
+    }
+
+    if results.iter().any(|result| {
+        matches!(
+            result,
+            Ok(package_checker::PackageCheckResult::Failure { .. }) | Err(_)
+        )
+    }) {
+        std::process::exit(1);
     }
 
     Ok(())
