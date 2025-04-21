@@ -1,0 +1,66 @@
+name: ❄️
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+    branches: [main]
+    paths:
+      - '**'
+      - '!**.md'
+      - '!.vscode'
+  pull_request:
+    paths:
+      - '**'
+      - '!**.md'
+      - '!.vscode'
+  schedule:
+    # Every 10:42 JST
+    # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
+    - cron: '42 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        # Don't add slow runners such as macos-13 even if supporting it.
+        runner:
+          - ubuntu-24.04
+          - macos-15
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@e50d5f73bfe71c2dd0aa4218de8f4afa59f8f81d # v16
+      - run: nix build
+
+  flake:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@e50d5f73bfe71c2dd0aa4218de8f4afa59f8f81d # v16
+      - run: nix flake check
+      - run: nix flake show
+
+  shell:
+    defaults:
+      run:
+        shell: nix develop --command bash -eu -o pipefail {0}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Don't add slow runners such as macos-13 even if supporting it.
+        runner:
+          - ubuntu-24.04
+          - macos-15
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@e50d5f73bfe71c2dd0aa4218de8f4afa59f8f81d # v16
+      - run: echo 'This step should be done before any other "nix develop" steps to measure the setup time'
+      - run: cargo fmt --check
+      - run: cargo clippy -- --deny warnings
+      - run: cargo test

@@ -24,7 +24,7 @@ pub fn analyze_log(raw: &str) -> Result<LogAnalysisResult> {
         return Ok(LogAnalysisResult::Success { pr_url: None });
     }
 
-    return Ok(LogAnalysisResult::Failure);
+    Ok(LogAnalysisResult::Failure)
 }
 
 #[cfg(test)]
