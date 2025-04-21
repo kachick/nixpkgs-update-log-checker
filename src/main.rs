@@ -20,7 +20,7 @@ async fn main() -> Result<()> {
     for (pkg, result) in packages.iter().zip(results) {
         match result {
             Ok(res) => println!("{}: {}", pkg, res),
-            Err(_) => println!("[ERROR] {}: Could not fetch logs", pkg),
+            Err(_) => println!("\x1b[31m[ERROR]\x1b[0m {}: Unknown error to analyze", pkg),
         }
     }
 
