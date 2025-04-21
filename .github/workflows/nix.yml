@@ -33,18 +33,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@e50d5f73bfe71c2dd0aa4218de8f4afa59f8f81d # v16
-      # Don't use Swatinem/rust-cache for adjusting with Nix environment
-      # https://github.com/actions/cache/blob/d4323d4df104b026a6aa633fdb11d772146be0bf/examples.md?plain=1#L610-L622
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-flake-${{ hashFiles('flake.lock', '**/*.nix') }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-flake-${{ hashFiles('flake.lock', '**/*.nix') }}-
       - run: nix build
 
   flake:
