@@ -5,9 +5,11 @@ on:
       - '[0-9]+.[0-9]+.[0-9]+'
     branches: [main]
     paths:
+      - '**'
       - '!**.md'
   pull_request:
     paths:
+      - '**'
       - '!**.md'
   schedule:
     # Every 10:42 JST
