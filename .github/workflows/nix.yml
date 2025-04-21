@@ -45,6 +45,9 @@ jobs:
       - run: nix flake show
 
   shell:
+    defaults:
+      run:
+        shell: nix develop --command bash -eu -o pipefail {0}
     strategy:
       fail-fast: false
       matrix:
@@ -57,4 +60,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@e50d5f73bfe71c2dd0aa4218de8f4afa59f8f81d # v16
-      - run: nix develop --command echo 'Setting up your shell environment'
+      - run: echo 'This step should be done before any other "nix develop" steps to measure the setup time'
+      - run: cargo fmt --check
+      - run: cargo clippy -- --deny warnings
+      - run: cargo test
