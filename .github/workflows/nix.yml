@@ -1,0 +1,54 @@
+name: ❄️
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+    branches: [main]
+    paths:
+      - '!**.md'
+  pull_request:
+    paths:
+      - '!**.md'
+  schedule:
+    # Every 10:42 JST
+    # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
+    - cron: '42 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@e50d5f73bfe71c2dd0aa4218de8f4afa59f8f81d # v16
+      # Don't use Swatinem/rust-cache for adjusting with Nix environment
+      # https://github.com/actions/cache/blob/d4323d4df104b026a6aa633fdb11d772146be0bf/examples.md?plain=1#L610-L622
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-flake-${{ hashFiles('flake.lock', '**/*.nix') }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-flake-${{ hashFiles('flake.lock', '**/*.nix') }}-
+      - run: nix build
+
+  flake:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@e50d5f73bfe71c2dd0aa4218de8f4afa59f8f81d # v16
+      - run: nix flake check
+      - run: nix flake show
+
+  shell:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@e50d5f73bfe71c2dd0aa4218de8f4afa59f8f81d # v16
+      - run: nix develop --command echo 'Setting up your shell environment'
