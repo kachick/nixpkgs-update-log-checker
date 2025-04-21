@@ -17,19 +17,26 @@ async fn main() -> Result<()> {
     )
     .await;
 
+    let mut has_unexpected_error = false;
+
     for (pkg, result) in packages.iter().zip(results.iter()) {
         match result {
             Ok(res) => println!("{}: {}", pkg, res),
-            Err(_) => println!("\x1b[31m[ERROR]\x1b[0m {}: Unknown error to analyze", pkg),
+            Err(_) => {
+                println!("\x1b[31m[ERROR]\x1b[0m {}: Unknown error to analyze", pkg);
+                has_unexpected_error = true;
+            }
         }
     }
 
-    if results.iter().any(|result| {
-        matches!(
-            result,
-            Ok(package_checker::PackageCheckResult::Failure { .. }) | Err(_)
-        )
-    }) {
+    if has_unexpected_error
+        || results.iter().any(|result| {
+            matches!(
+                result,
+                Ok(package_checker::PackageCheckResult::Failure { .. })
+            )
+        })
+    {
         std::process::exit(1);
     }
 
