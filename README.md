@@ -34,7 +34,9 @@ Repology might return different package names, [extracting from nixpkgs](https:/
 
 ## Limitation
 
-The log analysis is based on experience, so it might give wrong results if it sees a pattern I’m not familiar with.
+- The log analysis is based on experience, so it might give wrong results if it sees a pattern I’m not familiar with.
+- Ideally we should respect [these skipped logs](https://github.com/nix-community/nixpkgs-update/blob/363f92cdbbf57bb13eec95c22c2b068d45fa2cea/src/Skiplist.hs#L168),
+  however just handled as a failure
 
 ## Resources
 
