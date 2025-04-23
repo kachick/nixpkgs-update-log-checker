@@ -20,7 +20,7 @@ pub fn analyze_log(raw: &str) -> Result<LogAnalysisResult> {
         }
     }
 
-    let keywords = vec![
+    let keywords = [
         "Packages updated!",
         "There might already be an open PR for this update:", // https://nixpkgs-update-logs.nix-community.org/tlrc/2025-03-17.log
         "An auto update branch exists with an equal or greater version", // https://nixpkgs-update-logs.nix-community.org/podman/2025-04-22.log,
