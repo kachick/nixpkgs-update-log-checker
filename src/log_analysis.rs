@@ -20,7 +20,14 @@ pub fn analyze_log(raw: &str) -> Result<LogAnalysisResult> {
         }
     }
 
-    if raw.contains("Packages updated!") {
+    let keywords = vec![
+        "Packages updated!",
+        "There might already be an open PR for this update:", // https://nixpkgs-update-logs.nix-community.org/tlrc/2025-03-17.log
+        "An auto update branch exists with an equal or greater version", // https://nixpkgs-update-logs.nix-community.org/podman/2025-04-22.log,
+        "No auto update branch exists", // https://nixpkgs-update-logs.nix-community.org/treefmt/2025-04-11.log
+        "Do not update GNOME during a release cycle", // https://nixpkgs-update-logs.nix-community.org/loupe/2025-04-15.log
+    ];
+    if keywords.iter().any(|&keyword| raw.contains(keyword)) {
         return Ok(LogAnalysisResult::Success { pr_url: None });
     }
 
