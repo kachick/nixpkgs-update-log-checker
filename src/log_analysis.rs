@@ -8,6 +8,11 @@ pub enum LogAnalysisResult {
 pub fn analyze_log(raw: &str) -> Result<LogAnalysisResult> {
     let lines: Vec<&str> = raw.lines().collect();
 
+    // Should return early. See GH-6
+    if raw.contains("nix build failed.") {
+        return Ok(LogAnalysisResult::Failure);
+    }
+
     if let Some(last_line) = lines.last() {
         let pr_prefix_for_api = "https://api.github.com/repos/NixOS/nixpkgs/pulls/";
         if let Some(pr_number) = last_line.strip_prefix(pr_prefix_for_api) {
