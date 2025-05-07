@@ -9,7 +9,7 @@ let
 in
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "nixpkgs-update-log-checker";
-  version = "0.1.0";
+  version = with builtins; (fromTOML (readFile ./Cargo.toml)).package.version;
 
   src = lib.fileset.toSource {
     root = ./.;
