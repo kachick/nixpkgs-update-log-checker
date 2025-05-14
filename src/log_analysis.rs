@@ -9,7 +9,7 @@ pub fn analyze_log(raw: &str) -> Result<LogAnalysisResult> {
     let lines: Vec<&str> = raw.lines().collect();
 
     // Should return early. See GH-6
-    if raw.contains("nix build failed.") {
+    if lines.contains(&"nix build failed.") {
         return Ok(LogAnalysisResult::Failure);
     }
 
@@ -123,9 +123,28 @@ The diff was empty after rewrites.";
     }
 
     #[test]
-    fn test_analyze_log_failure() {
+    fn test_analyze_log_failure_with_no_success() {
         // Extracted from https://nixpkgs-update-logs.nix-community.org/fishnet/2025-04-10.log
         let log = "fishnet 2.9.4 -> 2.9.5 https://github.com/lichess-org/fishnet/releases";
+        let result = analyze_log(log).unwrap();
+        assert!(matches!(result, LogAnalysisResult::Failure));
+    }
+
+    #[test]
+    fn test_analyze_log_failure_with_clarified_build_failed() {
+        // Extracted from https://nixpkgs-update-logs.nix-community.org/chawan/2025-05-04.log
+        let log = r#"Enqueuing group of 1 packages
+ - chawan-0-unstable-2025-04-18: UPDATING ...
+ - chawan-0-unstable-2025-04-18: DONE.
+
+Packages updated!
+   patches = [ ./mancha-augment-path.diff ];
+
+No auto update branch exists
+Received ExitFailure 1 when running
+Raw command: nix-build --option sandbox true --arg config "{ allowBroken = true; allowUnfree = true; allowAliases = false; }" --arg overlays "[ ]" -A chawan
+nix build failed.
+[01m[Kgcc:[m[K [01;31m[Kerror: [m[Kthe: linker input file not found: No such file or directory"#;
         let result = analyze_log(log).unwrap();
         assert!(matches!(result, LogAnalysisResult::Failure));
     }
