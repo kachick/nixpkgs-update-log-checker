@@ -14,6 +14,10 @@ pub fn analyze_log(raw: &str) -> Result<LogAnalysisResult> {
     }
 
     if let Some(last_line) = lines.last() {
+        if last_line.starts_with("error") {
+            return Ok(LogAnalysisResult::Failure);
+        }
+
         let pr_prefix_for_api = "https://api.github.com/repos/NixOS/nixpkgs/pulls/";
         if let Some(pr_number) = last_line.strip_prefix(pr_prefix_for_api) {
             if pr_number.chars().all(|c| c.is_ascii_digit()) {
@@ -145,6 +149,23 @@ Received ExitFailure 1 when running
 Raw command: nix-build --option sandbox true --arg config "{ allowBroken = true; allowUnfree = true; allowAliases = false; }" --arg overlays "[ ]" -A chawan
 nix build failed.
 [01m[Kgcc:[m[K [01;31m[Kerror: [m[Kthe: linker input file not found: No such file or directory"#;
+        let result = analyze_log(log).unwrap();
+        assert!(matches!(result, LogAnalysisResult::Failure));
+    }
+
+    #[test]
+    fn test_analyze_log_failure_with_ending_failed() {
+        // Extracted from https://nixpkgs-update-logs.nix-community.org/dbeaver/2024-05-16.log
+        let log = r#"dbeaver 22.2.2 -> 24.0.4 https://github.com/dbeaver/dbeaver/releases
+attrpath: dbeaver
+Checking auto update branch...
+No auto update branch exists
+[updateScript]
+[updateScript] skipping because derivation has no updateScript
+Diff after rewrites:
+
+error: build log of 'dbeaver' is not available
+"#;
         let result = analyze_log(log).unwrap();
         assert!(matches!(result, LogAnalysisResult::Failure));
     }
