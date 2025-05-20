@@ -20,7 +20,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     ];
   };
 
-  cargoHash = "sha256-M6xGyiEKWnu/1gxIRB4PPjpcxF23RHDI4O+jLn7NvdI=";
+  cargoLock.lockFile = ./Cargo.lock;
 
   nativeInstallCheckInputs = [
     versionCheckHook
