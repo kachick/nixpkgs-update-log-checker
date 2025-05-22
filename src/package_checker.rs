@@ -17,6 +17,9 @@ pub enum PackageCheckResult {
     LogNotFound {
         log_list_url: String,
     },
+    Skip {
+        log_url: String,
+    },
 }
 
 impl std::fmt::Display for PackageCheckResult {
@@ -38,6 +41,9 @@ impl std::fmt::Display for PackageCheckResult {
                     "\x1b[33m[WARN]\x1b[0m: No logs found at {}",
                     log_list_url
                 )
+            }
+            PackageCheckResult::Skip { log_url } => {
+                write!(f, "\x1b[33m[WARN]\x1b[0m: Skipped log={}", log_url)
             }
         }
     }
@@ -93,6 +99,9 @@ pub async fn check_package(client: &Client, pname: &str) -> Result<PackageCheckR
             pr_url,
         }),
         log_analysis::LogAnalysisResult::Failure => Ok(PackageCheckResult::Failure {
+            log_url: latest_log_url,
+        }),
+        log_analysis::LogAnalysisResult::NoUpdater => Ok(PackageCheckResult::Skip {
             log_url: latest_log_url,
         }),
     }

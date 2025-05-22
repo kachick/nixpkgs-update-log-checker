@@ -3,6 +3,7 @@ use anyhow::Result;
 pub enum LogAnalysisResult {
     Success { pr_url: Option<String> },
     Failure,
+    NoUpdater,
 }
 
 pub fn analyze_log(raw: &str) -> Result<LogAnalysisResult> {
@@ -27,6 +28,10 @@ pub fn analyze_log(raw: &str) -> Result<LogAnalysisResult> {
                 });
             }
         }
+    }
+
+    if lines.contains(&"[updateScript] skipping because derivation has no updateScript") {
+        return Ok(LogAnalysisResult::NoUpdater);
     }
 
     let keywords = [
@@ -154,7 +159,7 @@ nix build failed.
     }
 
     #[test]
-    fn test_analyze_log_failure_with_ending_failed() {
+    fn test_analyze_log_ending_failed_prefers_no_updaer() {
         // Extracted from https://nixpkgs-update-logs.nix-community.org/dbeaver/2024-05-16.log
         let log = r#"dbeaver 22.2.2 -> 24.0.4 https://github.com/dbeaver/dbeaver/releases
 attrpath: dbeaver
@@ -168,5 +173,28 @@ error: build log of 'dbeaver' is not available
 "#;
         let result = analyze_log(log).unwrap();
         assert!(matches!(result, LogAnalysisResult::Failure));
+    }
+
+    #[test]
+    fn test_analyze_log_no_updaer() {
+        // https://nixpkgs-update-logs.nix-community.org/stockfish/2025-05-13.log
+        let log = r#"stockfish 17 -> 17.1 https://repology.org/project/stockfish/versions
+attrpath: stockfish
+Checking auto update branch...
+No auto update branch exists
+[version]
+[version] generic version rewriter does not support multiple hashes
+[rustCrateVersion]
+[rustCrateVersion] No cargoSha256 or cargoHash found
+[golangModuleVersion]
+[golangModuleVersion] Not a buildGoModule package with vendorSha256 or vendorHash
+[npmDepsVersion]
+[npmDepsVersion] No npmDepsHash
+[updateScript]
+[updateScript] skipping because derivation has no updateScript
+The diff was empty after rewrites.
+"#;
+        let result = analyze_log(log).unwrap();
+        assert!(matches!(result, LogAnalysisResult::NoUpdater));
     }
 }
