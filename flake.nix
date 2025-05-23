@@ -33,8 +33,13 @@
         in
         {
           default = pkgs.mkShell {
-            # Fix nixd pkgs versions in the inlay hints
-            NIX_PATH = "nixpkgs=${pkgs.path}";
+            env = {
+              # Fix nixd pkgs versions in the inlay hints
+              NIX_PATH = "nixpkgs=${pkgs.path}";
+
+              # Workaround for rust-analyzer error: "ERROR can't load standard library, try installing `rust-src`"
+              RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}";
+            };
 
             buildInputs = (
               with pkgs;
