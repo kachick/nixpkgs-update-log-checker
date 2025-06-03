@@ -7,7 +7,7 @@ pub enum LogAnalysisResult {
 }
 
 pub fn analyze_log(raw: &str) -> Result<LogAnalysisResult> {
-    let lines: Vec<&str> = raw.lines().collect();
+    let lines: Vec<&str> = raw.trim_end().lines().collect();
 
     // Should return early. See GH-6
     if lines.contains(&"nix build failed.") {
