@@ -7,7 +7,7 @@ edition = "2024"
 anyhow = "1.0"
 clap = { version = "4.5.39", features = ["derive"] }
 futures = "0.3.31"
-reqwest = { version = "0.12.18", default-features = false, features = ["blocking", "rustls-tls"] }
+reqwest = { version = "0.12.19", default-features = false, features = ["blocking", "rustls-tls"] }
 scraper = "0.23.1"
 tokio = { version = "1.45.1", features = ["rt-multi-thread", "macros"] }
 url = "2.5.4"
