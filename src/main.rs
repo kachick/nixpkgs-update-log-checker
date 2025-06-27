@@ -42,3 +42,33 @@ async fn main() -> Result<()> {
 
     Ok(())
 }
+
+// #[tokio::main]
+// async fn main() -> Result<()> {
+//     let packages = cli::parse_cli_args()?;
+//     let client = Client::builder().build()?;
+//     let results = join_all(packages.iter().map(|pkg| check_package(&client, pkg))).await;
+
+//     let mut has_error = false;
+
+//     for (pkg, result) in packages.iter().zip(results.iter()) {
+//         match result {
+//             Ok(res) => println!("{}: {}", pkg, res),
+//             Err(_) => {
+//                 println!("\x1b[31m[ERROR]\x1b[0m {}: Unknown error to analyze", pkg);
+//                 has_error = true;
+//             }
+//         }
+//     }
+
+//     // FailureButIgnoredは除外してエラー判定
+//     if has_error
+//         || results
+//             .iter()
+//             .any(|result| matches!(result, Ok(PackageCheckResult::Failure { .. })))
+//     {
+//         std::process::exit(1);
+//     }
+
+//     Ok(())
+// }

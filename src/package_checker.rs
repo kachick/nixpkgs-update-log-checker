@@ -3,7 +3,7 @@ use reqwest::Client;
 use scraper::{Html, Selector};
 use url::Url;
 
-use crate::log_analysis;
+use crate::{cli, log_analysis};
 
 #[derive(Debug)]
 pub enum PackageCheckResult {
@@ -13,6 +13,10 @@ pub enum PackageCheckResult {
     },
     Failure {
         log_url: String,
+    },
+    FailureButIgnored {
+        log_url: String,
+        reason: String,
     },
     LogNotFound {
         log_list_url: String,
@@ -34,6 +38,13 @@ impl std::fmt::Display for PackageCheckResult {
             }
             PackageCheckResult::Failure { log_url } => {
                 write!(f, "\x1b[31m[FAILURE]\x1b[0m: log={}", log_url)
+            }
+            PackageCheckResult::FailureButIgnored { log_url, reason } => {
+                write!(
+                    f,
+                    "\x1b[33m[WARN]\x1b[0m: {} (ignored: {})",
+                    log_url, reason
+                )
             }
             PackageCheckResult::LogNotFound { log_list_url } => {
                 write!(
@@ -70,7 +81,7 @@ fn get_log_urls(raw_log_urls: &str, list_url: &Url) -> Result<Vec<String>> {
 
 pub async fn check_package(client: &Client, pname: &str) -> Result<PackageCheckResult> {
     let log_list_url = Url::parse(&format!(
-        "https://nixpkgs-update-logs.nix-community.org/{}/", // Should specify last "/"
+        "https://nixpkgs-update-logs.nix-community.org/{}/",
         pname
     ))
     .map_err(|e| anyhow::anyhow!("Failed to parse log list URL: {}", e))?;
@@ -93,18 +104,42 @@ pub async fn check_package(client: &Client, pname: &str) -> Result<PackageCheckR
 
     let latest_log_url = log_urls[0].clone();
     let latest_log = client.get(&latest_log_url).send().await?.text().await?;
+
     match log_analysis::analyze_log(&latest_log)? {
         log_analysis::LogAnalysisResult::Success { pr_url } => Ok(PackageCheckResult::Success {
             log_url: latest_log_url,
             pr_url,
         }),
-        log_analysis::LogAnalysisResult::Failure => Ok(PackageCheckResult::Failure {
-            log_url: latest_log_url,
-        }),
         log_analysis::LogAnalysisResult::NoUpdater => Ok(PackageCheckResult::Skip {
             log_url: latest_log_url,
         }),
+        log_analysis::LogAnalysisResult::Failure => {
+            if let Some(reason) = is_problematic_date(&latest_log_url) {
+                Ok(PackageCheckResult::FailureButIgnored {
+                    log_url: latest_log_url,
+                    reason: reason.to_string(),
+                })
+            } else {
+                Ok(PackageCheckResult::Failure {
+                    log_url: latest_log_url,
+                })
+            }
+        }
     }
+}
+
+fn is_problematic_date(log_url: &str) -> Option<&'static str> {
+    const PROBLEMATIC_DATES: &[(&str, &str)] = &[(
+        "2025-06-20",
+        "On this day, many updaters failed due to a nixpkgs-wide bug: https://github.com/NixOS/nixpkgs/pull/410952#issuecomment-2991272370",
+    )];
+
+    for (date, reason) in PROBLEMATIC_DATES {
+        if log_url.contains(date) {
+            return Some(reason);
+        }
+    }
+    None
 }
 
 #[cfg(test)]
