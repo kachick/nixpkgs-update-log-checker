@@ -45,7 +45,7 @@
               with pkgs;
               [
                 bashInteractive
-                nixfmt-rfc-style
+                nixfmt
                 nixd
 
                 rustc
