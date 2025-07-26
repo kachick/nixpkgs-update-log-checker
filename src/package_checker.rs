@@ -27,23 +27,22 @@ impl std::fmt::Display for PackageCheckResult {
         match self {
             PackageCheckResult::Success { log_url, pr_url } => {
                 if let Some(pr_url) = pr_url {
-                    write!(f, "[UPDATED]: log={}, pr={}", log_url, pr_url)
+                    write!(f, "[UPDATED]: log={log_url}, pr={pr_url}")
                 } else {
-                    write!(f, "[AS-IS]: log={}", log_url)
+                    write!(f, "[AS-IS]: log={log_url}")
                 }
             }
             PackageCheckResult::Failure { log_url } => {
-                write!(f, "\x1b[31m[FAILURE]\x1b[0m: log={}", log_url)
+                write!(f, "\x1b[31m[FAILURE]\x1b[0m: log={log_url}")
             }
             PackageCheckResult::LogNotFound { log_list_url } => {
                 write!(
                     f,
-                    "\x1b[33m[WARN]\x1b[0m: No logs found at {}",
-                    log_list_url
+                    "\x1b[33m[WARN]\x1b[0m: No logs found at {log_list_url}"
                 )
             }
             PackageCheckResult::Skip { log_url } => {
-                write!(f, "\x1b[33m[WARN]\x1b[0m: Skipped log={}", log_url)
+                write!(f, "\x1b[33m[WARN]\x1b[0m: Skipped log={log_url}")
             }
         }
     }
@@ -70,8 +69,7 @@ fn get_log_urls(raw_log_urls: &str, list_url: &Url) -> Result<Vec<String>> {
 
 pub async fn check_package(client: &Client, pname: &str) -> Result<PackageCheckResult> {
     let log_list_url = Url::parse(&format!(
-        "https://nixpkgs-update-logs.nix-community.org/{}/", // Should specify last "/"
-        pname
+        "https://nixpkgs-update-logs.nix-community.org/{pname}/"
     ))
     .map_err(|e| anyhow::anyhow!("Failed to parse log list URL: {}", e))?;
 
