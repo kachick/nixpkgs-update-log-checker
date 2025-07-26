@@ -21,9 +21,9 @@ async fn main() -> Result<()> {
 
     for (pkg, result) in packages.iter().zip(results.iter()) {
         match result {
-            Ok(res) => println!("{}: {}", pkg, res),
+            Ok(res) => println!("{pkg}: {res}"),
             Err(_) => {
-                println!("\x1b[31m[ERROR]\x1b[0m {}: Unknown error to analyze", pkg);
+                println!("\x1b[31m[ERROR]\x1b[0m {pkg}: Unknown error to analyze");
                 has_unexpected_error = true;
             }
         }
