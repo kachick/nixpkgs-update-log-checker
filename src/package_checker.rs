@@ -66,6 +66,7 @@ fn get_log_urls(raw_log_urls: &str, list_url: &Url) -> Result<Vec<String>> {
 
 pub async fn check_package(client: &Client, pname: &str) -> Result<PackageCheckResult> {
     let log_list_url = Url::parse(&format!(
+        // Should specify last "/"
         "https://nixpkgs-update-logs.nix-community.org/{pname}/"
     ))
     .map_err(|e| anyhow::anyhow!("Failed to parse log list URL: {}", e))?;
