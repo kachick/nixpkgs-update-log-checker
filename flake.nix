@@ -56,6 +56,7 @@
 
                 dprint
                 typos
+                zizmor
 
                 # Used in sample script
                 curl
