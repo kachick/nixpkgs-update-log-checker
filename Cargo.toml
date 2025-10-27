@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1.0"
-clap = { version = "4.5.49", features = ["derive"] }
+clap = { version = "4.5.50", features = ["derive"] }
 futures = "0.3.31"
 reqwest = { version = "0.12.24", default-features = false, features = ["blocking", "rustls-tls"] }
 scraper = "0.24.0"
