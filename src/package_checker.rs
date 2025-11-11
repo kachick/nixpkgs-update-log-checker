@@ -49,7 +49,7 @@ impl std::fmt::Display for PackageCheckResult {
 fn get_log_urls(raw_log_urls: &str, list_url: &Url) -> Result<Vec<String>> {
     let html = Html::parse_document(raw_log_urls);
     let anchor =
-        Selector::parse("a").map_err(|e| anyhow::anyhow!("Failed to parse selector 'a': {}", e))?;
+        Selector::parse("a").map_err(|e| anyhow::anyhow!("Failed to parse selector 'a': {e}"))?;
 
     let hrefs = html.select(&anchor).filter_map(|a| a.value().attr("href"));
 
@@ -69,7 +69,7 @@ pub async fn check_package(client: &Client, pname: &str) -> Result<PackageCheckR
         // Should specify last "/"
         "https://nixpkgs-update-logs.nix-community.org/{pname}/"
     ))
-    .map_err(|e| anyhow::anyhow!("Failed to parse log list URL: {}", e))?;
+    .map_err(|e| anyhow::anyhow!("Failed to parse log list URL: {e}"))?;
 
     let raw_log_urls = client
         .get(log_list_url.as_str())
@@ -79,7 +79,7 @@ pub async fn check_package(client: &Client, pname: &str) -> Result<PackageCheckR
         .await?;
 
     let log_urls = get_log_urls(&raw_log_urls, &log_list_url)
-        .map_err(|e| anyhow::anyhow!("Failed to fetch logs: {}", e))?;
+        .map_err(|e| anyhow::anyhow!("Failed to fetch logs: {e}"))?;
 
     if log_urls.is_empty() {
         return Ok(PackageCheckResult::LogNotFound {
