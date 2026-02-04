@@ -20,13 +20,13 @@ pub fn analyze_log(raw: &str) -> Result<LogAnalysisResult> {
         }
 
         let pr_prefix_for_api = "https://api.github.com/repos/NixOS/nixpkgs/pulls/";
-        if let Some(pr_number) = last_line.strip_prefix(pr_prefix_for_api) {
-            if pr_number.chars().all(|c| c.is_ascii_digit()) {
-                let pr_url = format!("https://github.com/NixOS/nixpkgs/pull/{pr_number}");
-                return Ok(LogAnalysisResult::Success {
-                    pr_url: Some(pr_url),
-                });
-            }
+        if let Some(pr_number) = last_line.strip_prefix(pr_prefix_for_api)
+            && pr_number.chars().all(|c| c.is_ascii_digit())
+        {
+            let pr_url = format!("https://github.com/NixOS/nixpkgs/pull/{pr_number}");
+            return Ok(LogAnalysisResult::Success {
+                pr_url: Some(pr_url),
+            });
         }
     }
 
