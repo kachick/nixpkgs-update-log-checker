@@ -48,7 +48,7 @@ Repology might return different package names, [extracting from nixpkgs](https:/
 ## Motivation
 
 I wanted to keep track of the packages I maintain or depend on.\
-Another reason is that I came across [this text](https://github.com/nix-community/nixpkgs-update/blob/363f92cdbbf57bb13eec95c22c2b068d45fa2cea/doc/details.md#L64-L67).
+Another reason is that I came across [this text](https://github.com/nix-community/nixpkgs-update/blob/363f92cdbbf57bb13eec95c22c2b068d45fa2cea/doc/details.md?plain=1#L64-L67).
 
 > There are a lot of packages `nixpkgs-update` currently has no hope of updating.\
 > Please dredge the logs to find out why your pet package is not receiving updates.
