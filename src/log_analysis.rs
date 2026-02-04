@@ -159,7 +159,7 @@ nix build failed.
     }
 
     #[test]
-    fn test_analyze_log_ending_failed_prefers_no_updaer() {
+    fn test_analyze_log_ending_failed_prefers_no_updater() {
         // Extracted from https://nixpkgs-update-logs.nix-community.org/dbeaver/2024-05-16.log
         let log = r#"dbeaver 22.2.2 -> 24.0.4 https://github.com/dbeaver/dbeaver/releases
 attrpath: dbeaver
@@ -176,7 +176,7 @@ error: build log of 'dbeaver' is not available
     }
 
     #[test]
-    fn test_analyze_log_no_updaer() {
+    fn test_analyze_log_no_updater() {
         // https://nixpkgs-update-logs.nix-community.org/stockfish/2025-05-13.log
         let log = r#"stockfish 17 -> 17.1 https://repology.org/project/stockfish/versions
 attrpath: stockfish
