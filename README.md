@@ -1,6 +1,8 @@
 # nixpkgs-update-log-checker
 
-Get a quick overview of whether the automatic update scripts for packages you care about are working or broken.
+[![built with garnix](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fgarnix.io%2Fapi%2Fbadges%2Fkachick%2Fnixpkgs-update-log-checker)](https://garnix.io/repo/kachick/nixpkgs-update-log-checker)
+
+Tracker for automatic updates in nixpkgs
 
 ## Usage
 
