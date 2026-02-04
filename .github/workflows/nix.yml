@@ -70,6 +70,18 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/setup-nix
       - run: echo 'This step should be done before any other "nix develop" steps to measure the setup time'
+      # Don't use Swatinem/rust-cache for adjusting with Nix environment
+      # See also https://github.com/kachick/dprint-plugin-typstyle/commit/50bc2b6bce904f9284d00cd5348dc4042de9f4df
+      - uses: actions/cache@v5
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-flake-${{ hashFiles('flake.lock') }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-flake-${{ hashFiles('flake.lock') }}-
       - run: cargo fmt --check
       - run: cargo clippy -- --deny warnings
       - run: cargo test
