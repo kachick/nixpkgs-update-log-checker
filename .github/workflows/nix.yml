@@ -29,7 +29,7 @@ jobs:
       matrix:
         runner:
           - ubuntu-24.04
-          - macos-26
+          # - macos-26 # If enabling, also consider adding garnix.yaml
           # - macos-15-intel # Don't enable for now. Because it is too slow
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 30
@@ -60,7 +60,7 @@ jobs:
       matrix:
         runner:
           - ubuntu-24.04
-          - macos-26
+          # - macos-26 # If enabling, also consider adding garnix.yaml
           # - macos-15-intel # Don't enable for now. Because it is too slow
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 30
