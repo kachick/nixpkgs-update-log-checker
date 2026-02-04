@@ -7,10 +7,18 @@ updates:
     ignore:
       - dependency-name: 'crate-ci/typos'
     cooldown:
-      default-days: 7
+      default-days: 3
+  - package-ecosystem: 'github-actions'
+    directory: '/.github/actions/setup-nix'
+    schedule:
+      interval: 'weekly'
+    ignore:
+      - dependency-name: 'crate-ci/typos'
+    cooldown:
+      default-days: 3
   - package-ecosystem: cargo
     directory: /
     schedule:
       interval: weekly
     cooldown:
-      default-days: 7
+      default-days: 3

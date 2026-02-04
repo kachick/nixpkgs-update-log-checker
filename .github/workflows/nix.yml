@@ -37,8 +37,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      # "DeterminateSystems/nix-installer-action" does not run on x86_64-darwin: https://github.com/DeterminateSystems/nix-src/issues/224
-      - uses: cachix/install-nix-action@4e002c8ec80594ecd40e759629461e26c8abed15 # v31.9.0
+      - uses: ./.github/actions/setup-nix
       - run: nix build
 
   flake:
@@ -48,7 +47,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - uses: cachix/install-nix-action@4e002c8ec80594ecd40e759629461e26c8abed15 # v31.9.0
+      - uses: ./.github/actions/setup-nix
       - run: nix flake check
       - run: nix flake show
 
@@ -69,7 +68,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - uses: cachix/install-nix-action@4e002c8ec80594ecd40e759629461e26c8abed15 # v31.9.0
+      - uses: ./.github/actions/setup-nix
       - run: echo 'This step should be done before any other "nix develop" steps to measure the setup time'
       - run: cargo fmt --check
       - run: cargo clippy -- --deny warnings
