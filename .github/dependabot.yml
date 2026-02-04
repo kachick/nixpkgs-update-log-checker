@@ -6,7 +6,11 @@ updates:
       interval: 'weekly'
     ignore:
       - dependency-name: 'crate-ci/typos'
+    cooldown:
+      default-days: 7
   - package-ecosystem: cargo
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
