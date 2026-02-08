@@ -15,24 +15,24 @@ Options:
   -p, --packages <packages>...  List of package names to check
 ```
 
-### From nix flake
+### Flake
 
 ```console
 nix run github:kachick/nixpkgs-update-log-checker -- --packages pname
 ```
 
-### Check your maintained packages
+### Your maintained packages
 
 ```bash
-pnames="$(
-  curl -H 'User-Agent: Mozilla' "https://repology.org/api/v1/projects/?search=&maintainer=$(git config user.email)&inrepo=nix_unstable" |
-    jq --raw-output 'keys | join(" ")'
-)"
-
-echo "$pnames" | xargs nixpkgs-update-log-checker --packages
+pnames="$(NIX_PATH=nixpkgs=channel:nixpkgs-unstable nix run github:kachick/nixpkgs-maintained-by -- -id kachick)" 
+echo "$pnames" | xargs nix run github:kachick/nixpkgs-update-log-checker -- --packages
 ```
 
-Repology might return different package names, [extracting from nixpkgs](https://discourse.nixos.org/t/how-to-get-a-list-of-packages-maintained-by-someone/29963/3) is another solution.
+See also [nixpkgs-maintained-by](https://github.com/kachick/nixpkgs-maintained-by).
+
+## GitHub Actions
+
+For example: [nixpkgs-health-check-action](https://github.com/kachick/nixpkgs-health-check-action)
 
 ## Limitation
 
@@ -44,6 +44,7 @@ Repology might return different package names, [extracting from nixpkgs](https:/
 
 - [List of update logs](https://nixpkgs-update-logs.nix-community.org/)
 - [Upstream](https://github.com/nix-community/nixpkgs-update)
+- [Notifier](https://github.com/nix-community/nixpkgs-update/issues/476)
 
 ## Motivation
 
