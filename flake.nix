@@ -70,6 +70,7 @@
                 # Used in sample script
                 curl
                 jq
+                sqlite
                 findutils # xargs
               ]
             );
