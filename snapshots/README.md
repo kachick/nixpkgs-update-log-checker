@@ -74,11 +74,11 @@ Analysis of the upstream `supervisor.py` reveals the following:
 In addition to individual log files, the following directories provide useful data:
 
 - **`https://nixpkgs-update-logs.nix-community.org/~fetchers/`**:
-    - Contains detailed output from fetcher runs (e.g., `github.123456789.txt`).
-    - Useful for bulk checking version updates before they are dequeued.
+  - Contains detailed output from fetcher runs (e.g., `github.123456789.txt`).
+  - Useful for bulk checking version updates before they are dequeued.
 - **`https://nixpkgs-update-logs.nix-community.org/~supervisor/`**:
-    - Contains `state.db` and supervisor's own logs (`YYYY-MM-DD.stdout.log`).
-    - Useful for debugging low-level process crashes.
+  - Contains `state.db` and supervisor's own logs (`YYYY-MM-DD.stdout.log`).
+  - Useful for debugging low-level process crashes.
 
 ## Schema Details
 
@@ -88,7 +88,7 @@ In addition to individual log files, the following directories provide useful da
 - `started`: Start time (Unix epoch)
 - `finished`: Finish time (Unix epoch)
 - `exit_code`: Process exit code (0 usually means the process finished, NOT necessarily a successful update)
-    - **Note**: Most build failures still result in `exit_code = 0`. You must parse the actual log file to determine success.
+  - **Note**: Most build failures still result in `exit_code = 0`. You must parse the actual log file to determine success.
 
 ### `queue` table
 
