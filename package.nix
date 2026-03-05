@@ -1,41 +1,36 @@
 {
   lib,
-  rustPlatform,
+  craneLib,
+  commonArgs,
+  cargoArtifacts,
   versionCheckHook,
 }:
 
 let
   mainProgram = "nixpkgs-update-log-checker";
 in
-rustPlatform.buildRustPackage (finalAttrs: {
-  pname = "nixpkgs-update-log-checker";
-  version = with builtins; (fromTOML (readFile ./Cargo.toml)).package.version;
+craneLib.buildPackage (
+  commonArgs
+  // {
+    inherit cargoArtifacts;
+    pname = "nixpkgs-update-log-checker";
+    version = with builtins; (fromTOML (readFile ./Cargo.toml)).package.version;
 
-  src = lib.fileset.toSource {
-    root = ./.;
-    fileset = lib.fileset.unions [
-      ./src
-      ./Cargo.toml
-      ./Cargo.lock
+    nativeInstallCheckInputs = [
+      versionCheckHook
     ];
-  };
+    doInstallCheck = true;
+    versionCheckProgram = "${placeholder "out"}/bin/${mainProgram}";
+    versionCheckProgramArg = "--version";
 
-  cargoLock.lockFile = ./Cargo.lock;
-
-  nativeInstallCheckInputs = [
-    versionCheckHook
-  ];
-  doInstallCheck = true;
-  versionCheckProgram = "${placeholder "out"}/bin/${mainProgram}";
-  versionCheckProgramArg = "--version";
-
-  meta = {
-    inherit mainProgram;
-    description = "CLI to check the update log of nixpkgs";
-    homepage = "https://github.com/kachick/nixpkgs-update-log-checker";
-    license = lib.licenses.mit;
-    maintainers = with lib.maintainers; [
-      kachick
-    ];
-  };
-})
+    meta = {
+      inherit mainProgram;
+      description = "CLI to check the update log of nixpkgs";
+      homepage = "https://github.com/kachick/nixpkgs-update-log-checker";
+      license = lib.licenses.mit;
+      maintainers = with lib.maintainers; [
+        kachick
+      ];
+    };
+  }
+)

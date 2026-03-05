@@ -10,16 +10,57 @@
 
   inputs = {
     nixpkgs.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
+    crane.url = "github:ipetkov/crane";
   };
 
   outputs =
     {
       nixpkgs,
+      crane,
       ...
     }:
     let
       lib = nixpkgs.lib;
       forAllSystems = lib.genAttrs lib.systems.flakeExposed;
+
+      mkCraneLib = pkgs: crane.mkLib pkgs;
+
+      mkCommonArgs =
+        pkgs:
+        let
+          craneLib = mkCraneLib pkgs;
+        in
+        {
+          src = craneLib.cleanCargoSource ./.;
+          strictDeps = true;
+
+          buildInputs =
+            [
+              # Add any runtime dependencies here
+            ]
+            ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
+              # Additional darwin specific inputs can be added here
+            ];
+        };
+
+      mkArtifacts =
+        pkgs:
+        let
+          craneLib = mkCraneLib pkgs;
+          commonArgs = mkCommonArgs pkgs;
+        in
+        craneLib.buildDepsOnly commonArgs;
+
+      mkPackage =
+        pkgs:
+        let
+          craneLib = mkCraneLib pkgs;
+          commonArgs = mkCommonArgs pkgs;
+          cargoArtifacts = mkArtifacts pkgs;
+        in
+        pkgs.callPackage ./package.nix {
+          inherit craneLib cargoArtifacts commonArgs;
+        };
     in
     {
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-tree);
@@ -30,8 +71,36 @@
           pkgs = nixpkgs.legacyPackages.${system};
         in
         rec {
-          nixpkgs-update-log-checker = pkgs.callPackage ./package.nix { };
+          nixpkgs-update-log-checker = mkPackage pkgs;
           default = nixpkgs-update-log-checker;
+        }
+      );
+
+      checks = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          craneLib = mkCraneLib pkgs;
+          commonArgs = mkCommonArgs pkgs;
+          cargoArtifacts = mkArtifacts pkgs;
+          nixpkgs-update-log-checker = mkPackage pkgs;
+        in
+        {
+          inherit nixpkgs-update-log-checker;
+          # Build the dependencies once and then reuse them for each check
+          nixpkgs-update-log-checker-clippy = craneLib.cargoClippy (
+            commonArgs
+            // {
+              inherit cargoArtifacts;
+              cargoClippyExtraArgs = "--all-targets -- --deny warnings";
+            }
+          );
+
+          nixpkgs-update-log-checker-fmt = craneLib.cargoFmt (commonArgs // { inherit cargoArtifacts; });
+
+          nixpkgs-update-log-checker-nextest = craneLib.cargoNextest (
+            commonArgs // { inherit cargoArtifacts; }
+          );
         }
       );
 
