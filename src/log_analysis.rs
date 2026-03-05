@@ -14,6 +14,7 @@ pub fn analyze_log(raw: &str) -> Result<LogAnalysisResult> {
         return Ok(LogAnalysisResult::Failure);
     }
 
+    // :)
     if let Some(last_line) = lines.last() {
         if last_line.starts_with("error") {
             return Ok(LogAnalysisResult::Failure);
