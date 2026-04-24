@@ -64,6 +64,8 @@ fn get_log_urls(raw_log_urls: &str, list_url: &Url) -> Result<Vec<String>> {
     Ok(log_urls)
 }
 
+// Test crate2nix: https://github.com/kachick/nixpkgs-update-log-checker/pull/98
+
 pub async fn check_package(client: &Client, pname: &str) -> Result<PackageCheckResult> {
     let log_list_url = Url::parse(&format!(
         // Should specify last "/"
