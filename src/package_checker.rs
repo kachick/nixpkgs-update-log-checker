@@ -71,7 +71,7 @@ pub async fn check_package(client: &Client, pname: &str) -> Result<PackageCheckR
         // Should specify last "/"
         "https://nixpkgs-update-logs.nix-community.org/{pname}/"
     ))
-    .map_err(|e| anyhow::anyhow!("Failed to parse log list URL: {e} - Test crate2nix"))?;
+    .map_err(|e| anyhow::anyhow!("Failed to parse log list URL: {e}"))?;
 
     let raw_log_urls = client
         .get(log_list_url.as_str())
