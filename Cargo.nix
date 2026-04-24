@@ -2379,6 +2379,9 @@ rec {
           }
         ];
         src = lib.cleanSourceWith { filter = sourceFilter;  src = ./.; };
+        authors = [
+          "Kenichi Kamiya <kachick1@gmail.com>"
+        ];
         dependencies = [
           {
             name = "anyhow";
