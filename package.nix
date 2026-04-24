@@ -28,6 +28,9 @@ in
 
     meta = (oldAttrs.meta or { }) // {
       inherit mainProgram;
+      description = "CLI to check the update log of nixpkgs";
+      homepage = "https://github.com/kachick/nixpkgs-update-log-checker";
+      license = lib.licenses.mit;
       maintainers = with lib.maintainers; [
         kachick
       ];
