@@ -7,7 +7,7 @@ let
   mainProgram = "nixpkgs-update-log-checker";
 in
 {
-  nixpkgs-update-log-checker = oldAttrs: {
+  ${mainProgram} = oldAttrs: {
     inherit mainProgram;
 
     src = lib.fileset.toSource {
