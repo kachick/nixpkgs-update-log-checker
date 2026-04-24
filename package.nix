@@ -10,6 +10,15 @@ in
   nixpkgs-update-log-checker = oldAttrs: {
     inherit mainProgram;
 
+    src = lib.fileset.toSource {
+      root = ./.;
+      fileset = lib.fileset.unions [
+        ./src
+        ./Cargo.toml
+        ./Cargo.lock
+      ];
+    };
+
     nativeInstallCheckInputs = (oldAttrs.nativeInstallCheckInputs or [ ]) ++ [
       versionCheckHook
     ];
