@@ -28,8 +28,16 @@
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          # crate2nix generated file
-          cargoNix = pkgs.callPackage ./Cargo.nix {
+          # Load crate2nix tools from nixpkgs source
+          crate2nixTools = pkgs.callPackage "${pkgs.crate2nix.src}/tools.nix" { };
+          # Auto-generate Cargo.nix via IFD
+          # generatedCargoNix returns a derivation that contains the generated nix file
+          generatedDir = crate2nixTools.generatedCargoNix {
+            name = "nixpkgs-update-log-checker";
+            src = ./.;
+          };
+          # Call the generated nix file with overrides
+          cargoNix = pkgs.callPackage "${generatedDir}/default.nix" {
             defaultCrateOverrides = pkgs.defaultCrateOverrides // (pkgs.callPackage ./package.nix { });
           };
         in
