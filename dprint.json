@@ -12,6 +12,8 @@
   "excludes": [
     ".direnv",
     "target",
+    "tmp",
+    "Cargo.nix",
     "**/*-lock.json"
   ],
   "plugins": [

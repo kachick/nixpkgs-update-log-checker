@@ -28,9 +28,13 @@
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
+          # crate2nix generated file
+          cargoNix = pkgs.callPackage ./Cargo.nix {
+            defaultCrateOverrides = pkgs.defaultCrateOverrides // (pkgs.callPackage ./package.nix { });
+          };
         in
         rec {
-          nixpkgs-update-log-checker = pkgs.callPackage ./package.nix { };
+          nixpkgs-update-log-checker = cargoNix.rootCrate.build;
           default = nixpkgs-update-log-checker;
         }
       );

@@ -1,7 +1,11 @@
 [package]
 name = "nixpkgs-update-log-checker"
 version = "0.1.0"
+authors = ["Kenichi Kamiya <kachick1@gmail.com>"]
 edition = "2024"
+homepage = "https://github.com/kachick/nixpkgs-update-log-checker"
+license = "MIT"
+description = "CLI to check the update log of nixpkgs"
 
 [dependencies]
 anyhow = "1.0"
