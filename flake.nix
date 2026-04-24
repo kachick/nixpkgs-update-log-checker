@@ -28,9 +28,14 @@
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
+          # crate2nix generated file
+          cargoNix = pkgs.callPackage ./Cargo.nix { };
         in
         rec {
-          nixpkgs-update-log-checker = pkgs.callPackage ./package.nix { };
+          nixpkgs-update-log-checker = pkgs.callPackage ./package.nix {
+            # Use the build from Cargo.nix instead of rustPlatform.buildRustPackage
+            innerBuild = cargoNix.rootCrate.build;
+          };
           default = nixpkgs-update-log-checker;
         }
       );
