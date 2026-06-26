@@ -72,7 +72,7 @@ jobs:
       - run: echo 'This step should be done before any other "nix develop" steps to measure the setup time'
       # Don't use Swatinem/rust-cache for adjusting with Nix environment
       # See also https://github.com/kachick/dprint-plugin-typstyle/commit/50bc2b6bce904f9284d00cd5348dc4042de9f4df
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/bin/
