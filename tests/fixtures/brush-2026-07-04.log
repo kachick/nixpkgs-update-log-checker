@@ -1,0 +1,281 @@
+Running nixpkgs-update (https://nix-community.org/update-bot/) with UPDATE_INFO: brush 0 -> 1
+attrpath: brush
+Checking auto update branch...
+Received ExitFailure 1 when running
+Raw command: nix-env -f /var/cache/nixpkgs-update/worker/outpath/outpaths.nix -qaP --no-name --out-path --arg path /var/cache/nixpkgs-update/worker/worktree/brush --arg checkMeta true --show-trace
+Standard output:
+
+evaluation warning: ArchiSteamFarm has been renamed to/replaced by 'archisteamfarm'
+evaluation warning: ArchiSteamFarm has been renamed to/replaced by 'archisteamfarm'
+evaluation warning: ArchiSteamFarm has been renamed to/replaced by 'archisteamfarm'
+evaluation warning: 'DisnixWebService' has been renamed to 'disnix-web-service'
+evaluation warning: 'DisnixWebService' has been renamed to 'disnix-web-service'
+evaluation warning: 'DisnixWebService' has been renamed to 'disnix-web-service'
+evaluation warning: 'LycheeSlicer' has been renamed to 'lycheeslicer'
+evaluation warning: 'LycheeSlicer' has been renamed to 'lycheeslicer'
+evaluation warning: 'LycheeSlicer' has been renamed to 'lycheeslicer'
+evaluation warning: 'QuadProgpp' has been renamed to 'quadprogpp'
+evaluation warning: 'QuadProgpp' has been renamed to 'quadprogpp'
+evaluation warning: 'QuadProgpp' has been renamed to 'quadprogpp'
+evaluation warning: 'Xaw3d' has been renamed to 'libxaw3d'
+evaluation warning: 'Xaw3d' has been renamed to 'libxaw3d'
+evaluation warning: 'Xaw3d' has been renamed to 'libxaw3d'
+evaluation warning: '_86Box' has been renamed to '_86box'
+evaluation warning: '_86Box' has been renamed to '_86box'
+evaluation warning: '_86Box' has been renamed to '_86box'
+evaluation warning: '_86Box-with-roms' has been renamed to '_86box-with-roms'
+evaluation warning: '_86Box-with-roms' has been renamed to '_86box-with-roms'
+evaluation warning: '_86Box-with-roms' has been renamed to '_86box-with-roms'
+error:
+       â¦ while evaluating the attribute 'aider-chat-full'
+
+       â¦ while evaluating the attribute 'x86_64-linux'
+
+       â¦ from call site
+         at /var/cache/nixpkgs-update/worker/outpath/outpaths.nix:42:6:
+           41|   tweak = lib.mapAttrs
+           42|     (name: val:
+             |      ^
+           43|       if name == "recurseForDerivations" then true
+
+       â¦ while calling anonymous lambda
+         at /var/cache/nixpkgs-update/worker/outpath/outpaths.nix:42:12:
+           41|   tweak = lib.mapAttrs
+           42|     (name: val:
+             |            ^
+           43|       if name == "recurseForDerivations" then true
+
+       â¦ while evaluating a branch condition
+         at /var/cache/nixpkgs-update/worker/outpath/outpaths.nix:44:12:
+           43|       if name == "recurseForDerivations" then true
+           44|       else if lib.isAttrs val && val.type or null != "derivation"
+             |            ^
+           45|               then recurseIntoAttrs (tweak val)
+
+       â¦ in the left operand of the AND (&&) operator
+         at /var/cache/nixpkgs-update/worker/outpath/outpaths.nix:44:31:
+           43|       if name == "recurseForDerivations" then true
+           44|       else if lib.isAttrs val && val.type or null != "derivation"
+             |                               ^
+           45|               then recurseIntoAttrs (tweak val)
+
+       â¦ while calling the 'isAttrs' builtin
+         at /var/cache/nixpkgs-update/worker/outpath/outpaths.nix:44:15:
+           43|       if name == "recurseForDerivations" then true
+           44|       else if lib.isAttrs val && val.type or null != "derivation"
+             |               ^
+           45|               then recurseIntoAttrs (tweak val)
+
+       â¦ from call site
+         at /var/cache/nixpkgs-update/worker/worktree/brush/lib/attrsets.nix:1348:61:
+         1347|   */
+         1348|   genAttrs = names: f: genAttrs' names (n: nameValuePair n (f n));
+             |                                                             ^
+         1349|
+
+       â¦ while calling anonymous lambda
+         at /var/cache/nixpkgs-update/worker/worktree/brush/pkgs/top-level/release-lib.nix:181:38:
+          180|     crossSystem: metaPatterns: f:
+          181|     forMatchingSystems metaPatterns (system: hydraJob' (f (pkgsForCross crossSystem system)));
+             |                                      ^
+          182|
+
+       â¦ from call site
+         at /var/cache/nixpkgs-update/worker/worktree/brush/pkgs/top-level/release-lib.nix:181:46:
+          180|     crossSystem: metaPatterns: f:
+          181|     forMatchingSystems metaPatterns (system: hydraJob' (f (pkgsForCross crossSystem system)));
+             |                                              ^
+          182|
+
+       â¦ while calling 'hydraJob'
+         at /var/cache/nixpkgs-update/worker/worktree/brush/lib/customisation.nix:464:5:
+          463|   hydraJob =
+          464|     drv:
+             |     ^
+          465|     let
+
+       â¦ while calling the 'deepSeq' builtin
+         at /var/cache/nixpkgs-update/worker/worktree/brush/lib/customisation.nix:497:35:
+          496|     in
+          497|     if drv == null then null else deepSeq drv' drv';
+             |                                   ^
+          498|
+
+       â¦ while evaluating the attribute 'outPath'
+         at /var/cache/nixpkgs-update/worker/worktree/brush/lib/customisation.nix:486:13:
+          485|           value = commonAttrs // {
+          486|             outPath = output.outPath;
+             |             ^
+          487|             drvPath = output.drvPath;
+
+       â¦ while evaluating the attribute 'outPath'
+         at /var/cache/nixpkgs-update/worker/worktree/brush/lib/customisation.nix:431:11:
+          430|             drv.${outputName}.drvPath;
+          431|           outPath =
+             |           ^
+          432|             assert condition;
+
+       â¦ while evaluating the attribute 'out.outPath'
+         at /var/cache/nixpkgs-update/worker/worktree/brush/lib/customisation.nix:431:11:
+          430|             drv.${outputName}.drvPath;
+          431|           outPath =
+             |           ^
+          432|             assert condition;
+
+       â¦ while calling the 'getAttr' builtin
+         at Â«nix-internalÂ»/derivation-internal.nix:50:17:
+           49|     value = commonAttrs // {
+           50|       outPath = builtins.getAttr outputName strict;
+             |                 ^
+           51|       drvPath = strict.drvPath;
+
+       â¦ while calling the 'derivationStrict' builtin
+         at Â«nix-internalÂ»/derivation-internal.nix:37:12:
+           36|
+           37|   strict = derivationStrict drvAttrs;
+             |            ^
+           38|
+
+       â¦ while evaluating derivation 'aider-chat-playwright-browser-help-bedrock-0.86.1'
+         whose name attribute is located at /var/cache/nixpkgs-update/worker/worktree/brush/pkgs/stdenv/generic/make-derivation.nix:651:11
+
+       â¦ while evaluating attribute 'propagatedBuildInputs' of derivation 'aider-chat-playwright-browser-help-bedrock-0.86.1'
+         at /var/cache/nixpkgs-update/worker/worktree/brush/pkgs/stdenv/generic/make-derivation.nix:729:11:
+          728|           depsHostHostPropagated = propagatedHostHostOutputs;
+          729|           propagatedBuildInputs = propagatedHostTargetOutputs;
+             |           ^
+          730|           depsTargetTargetPropagated = propagatedTargetTargetOutputs;
+
+       â¦ while evaluating the attribute 'out.outPath'
+         at /var/cache/nixpkgs-update/worker/worktree/brush/lib/customisation.nix:431:11:
+          430|             drv.${outputName}.drvPath;
+          431|           outPath =
+             |           ^
+          432|             assert condition;
+
+       â¦ while evaluating the attribute 'out.outPath'
+         at /var/cache/nixpkgs-update/worker/worktree/brush/lib/customisation.nix:431:11:
+          430|             drv.${outputName}.drvPath;
+          431|           outPath =
+             |           ^
+          432|             assert condition;
+
+       â¦ while calling the 'getAttr' builtin
+         at Â«nix-internalÂ»/derivation-internal.nix:50:17:
+           49|     value = commonAttrs // {
+           50|       outPath = builtins.getAttr outputName strict;
+             |                 ^
+           51|       drvPath = strict.drvPath;
+
+       â¦ while calling the 'derivationStrict' builtin
+         at Â«nix-internalÂ»/derivation-internal.nix:37:12:
+           36|
+           37|   strict = derivationStrict drvAttrs;
+             |            ^
+           38|
+
+       â¦ while evaluating derivation 'python3.13-llama-index-embeddings-huggingface-0.7.0'
+         whose name attribute is located at /var/cache/nixpkgs-update/worker/worktree/brush/pkgs/stdenv/generic/make-derivation.nix:651:11
+
+       â¦ while evaluating attribute 'propagatedBuildInputs' of derivation 'python3.13-llama-index-embeddings-huggingface-0.7.0'
+         at /var/cache/nixpkgs-update/worker/worktree/brush/pkgs/stdenv/generic/make-derivation.nix:729:11:
+          728|           depsHostHostPropagated = propagatedHostHostOutputs;
+          729|           propagatedBuildInputs = propagatedHostTargetOutputs;
+             |           ^
+          730|           depsTargetTargetPropagated = propagatedTargetTargetOutputs;
+
+       â¦ while evaluating the attribute 'out.outPath'
+         at /var/cache/nixpkgs-update/worker/worktree/brush/lib/customisation.nix:431:11:
+          430|             drv.${outputName}.drvPath;
+          431|           outPath =
+             |           ^
+          432|             assert condition;
+
+       â¦ while calling the 'getAttr' builtin
+         at Â«nix-internalÂ»/derivation-internal.nix:50:17:
+           49|     value = commonAttrs // {
+           50|       outPath = builtins.getAttr outputName strict;
+             |                 ^
+           51|       drvPath = strict.drvPath;
+
+       â¦ while calling the 'derivationStrict' builtin
+         at Â«nix-internalÂ»/derivation-internal.nix:37:12:
+           36|
+           37|   strict = derivationStrict drvAttrs;
+             |            ^
+           38|
+
+       â¦ while evaluating derivation 'python3.13-sentence-transformers-5.4.1'
+         whose name attribute is located at /var/cache/nixpkgs-update/worker/worktree/brush/pkgs/stdenv/generic/make-derivation.nix:651:11
+
+       â¦ while evaluating attribute 'nativeBuildInputs' of derivation 'python3.13-sentence-transformers-5.4.1'
+         at /var/cache/nixpkgs-update/worker/worktree/brush/pkgs/stdenv/generic/make-derivation.nix:719:11:
+          718|           depsBuildBuild = buildBuildOutputs;
+          719|           nativeBuildInputs = buildHostOutputs;
+             |           ^
+          720|           depsBuildTarget = buildTargetOutputs;
+
+       â¦ while evaluating the attribute 'out.outPath'
+         at /var/cache/nixpkgs-update/worker/worktree/brush/lib/customisation.nix:431:11:
+          430|             drv.${outputName}.drvPath;
+          431|           outPath =
+             |           ^
+          432|             assert condition;
+
+       â¦ while calling the 'getAttr' builtin
+         at Â«nix-internalÂ»/derivation-internal.nix:50:17:
+           49|     value = commonAttrs // {
+           50|       outPath = builtins.getAttr outputName strict;
+             |                 ^
+           51|       drvPath = strict.drvPath;
+
+       â¦ while calling the 'derivationStrict' builtin
+         at Â«nix-internalÂ»/derivation-internal.nix:37:12:
+           36|
+           37|   strict = derivationStrict drvAttrs;
+             |            ^
+           38|
+
+       â¦ while evaluating derivation 'python3.13-torchaudio-2.11.0'
+         whose name attribute is located at /var/cache/nixpkgs-update/worker/worktree/brush/pkgs/stdenv/generic/make-derivation.nix:651:11
+
+       â¦ while evaluating attribute 'nativeBuildInputs' of derivation 'python3.13-torchaudio-2.11.0'
+         at /var/cache/nixpkgs-update/worker/worktree/brush/pkgs/stdenv/generic/make-derivation.nix:719:11:
+          718|           depsBuildBuild = buildBuildOutputs;
+          719|           nativeBuildInputs = buildHostOutputs;
+             |           ^
+          720|           depsBuildTarget = buildTargetOutputs;
+
+       â¦ while evaluating the attribute 'out.outPath'
+         at /var/cache/nixpkgs-update/worker/worktree/brush/lib/customisation.nix:431:11:
+          430|             drv.${outputName}.drvPath;
+          431|           outPath =
+             |           ^
+          432|             assert condition;
+
+       â¦ while calling the 'getAttr' builtin
+         at Â«nix-internalÂ»/derivation-internal.nix:50:17:
+           49|     value = commonAttrs // {
+           50|       outPath = builtins.getAttr outputName strict;
+             |                 ^
+           51|       drvPath = strict.drvPath;
+
+       â¦ while calling the 'derivationStrict' builtin
+         at Â«nix-internalÂ»/derivation-internal.nix:37:12:
+           36|
+           37|   strict = derivationStrict drvAttrs;
+             |            ^
+           38|
+
+       â¦ while evaluating derivation 'python3.13-fairseq-0.12.3'
+         whose name attribute is located at /var/cache/nixpkgs-update/worker/worktree/brush/pkgs/stdenv/generic/make-derivation.nix:651:11
+
+       â¦ while evaluating attribute 'propagatedBuildInputs' of derivation 'python3.13-fairseq-0.12.3'
+         at /var/cache/nixpkgs-update/worker/worktree/brush/pkgs/stdenv/generic/make-derivation.nix:729:11:
+          728|           depsHostHostPropagated = propagatedHostHostOutputs;
+          729|           propagatedBuildInputs = propagatedHostTargetOutputs;
+             |           ^
+          730|           depsTargetTargetPropagated = propagatedTargetTargetOutputs;
+
+       error: infinite recursion encountered
+

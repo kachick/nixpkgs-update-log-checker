@@ -3,10 +3,14 @@ use anyhow::Result;
 pub enum LogAnalysisResult {
     Success { pr_url: Option<String> },
     Failure,
-    NoUpdater,
+    Skip,
 }
 
-pub fn analyze_log(raw: &str) -> Result<LogAnalysisResult> {
+pub fn analyze_log(raw: &str, log_url: &str) -> Result<LogAnalysisResult> {
+    if log_url.contains("/2026-07-04.log") && raw.contains("infinite recursion encountered") {
+        return Ok(LogAnalysisResult::Skip);
+    }
+
     let lines: Vec<&str> = raw.trim_end().lines().collect();
 
     // Should return early. See GH-6
@@ -31,7 +35,7 @@ pub fn analyze_log(raw: &str) -> Result<LogAnalysisResult> {
     }
 
     if lines.contains(&"[updateScript] skipping because derivation has no updateScript") {
-        return Ok(LogAnalysisResult::NoUpdater);
+        return Ok(LogAnalysisResult::Skip);
     }
 
     let keywords = [
@@ -74,7 +78,11 @@ Diff after rewrites:
 
 [pull requests you find important]: https://github.com/NixOS/nixpkgs/pulls?q=is%3Aopen+sort%3Areactions-%2B1-desc
 https://api.github.com/repos/NixOS/nixpkgs/pulls/392589"#;
-        let result = analyze_log(log).unwrap();
+        let result = analyze_log(
+            log,
+            "https://nixpkgs-update-logs.nix-community.org/dprint/2025-03-24.log",
+        )
+        .unwrap();
         match result {
             LogAnalysisResult::Success { pr_url } => {
                 assert_eq!(
@@ -94,7 +102,11 @@ https://api.github.com/repos/NixOS/nixpkgs/pulls/392589"#;
 
 [pull requests you find important]: https://github.com/NixOS/nixpkgs/pulls?q=is%3Aopen+sort%3Areactions-%2B1-desc
 https://api.github.com/repos/NixOS/nixpkgs/pulls/395562"#;
-        let result = analyze_log(log).unwrap();
+        let result = analyze_log(
+            log,
+            "https://nixpkgs-update-logs.nix-community.org/plemoljp/2025-04-02.log",
+        )
+        .unwrap();
         match result {
             LogAnalysisResult::Success { pr_url } => {
                 assert_eq!(
@@ -122,7 +134,11 @@ Enqueuing group of 1 packages
 Packages updated!
 
 The diff was empty after rewrites.";
-        let result = analyze_log(log).unwrap();
+        let result = analyze_log(
+            log,
+            "https://nixpkgs-update-logs.nix-community.org/dprint/2025-04-13.log",
+        )
+        .unwrap();
         match result {
             LogAnalysisResult::Success { pr_url } => {
                 assert_eq!(pr_url, None);
@@ -135,7 +151,11 @@ The diff was empty after rewrites.";
     fn test_analyze_log_failure_with_no_success() {
         // Extracted from https://nixpkgs-update-logs.nix-community.org/fishnet/2025-04-10.log
         let log = "fishnet 2.9.4 -> 2.9.5 https://github.com/lichess-org/fishnet/releases";
-        let result = analyze_log(log).unwrap();
+        let result = analyze_log(
+            log,
+            "https://nixpkgs-update-logs.nix-community.org/fishnet/2025-04-10.log",
+        )
+        .unwrap();
         assert!(matches!(result, LogAnalysisResult::Failure));
     }
 
@@ -154,12 +174,16 @@ Received ExitFailure 1 when running
 Raw command: nix-build --option sandbox true --arg config "{ allowBroken = true; allowUnfree = true; allowAliases = false; }" --arg overlays "[ ]" -A chawan
 nix build failed.
 [01m[Kgcc:[m[K [01;31m[Kerror: [m[Kthe: linker input file not found: No such file or directory"#;
-        let result = analyze_log(log).unwrap();
+        let result = analyze_log(
+            log,
+            "https://nixpkgs-update-logs.nix-community.org/chawan/2025-05-04.log",
+        )
+        .unwrap();
         assert!(matches!(result, LogAnalysisResult::Failure));
     }
 
     #[test]
-    fn test_analyze_log_ending_failed_prefers_no_updater() {
+    fn test_analyze_log_ending_failed_prefers_skip() {
         // Extracted from https://nixpkgs-update-logs.nix-community.org/dbeaver/2024-05-16.log
         let log = r#"dbeaver 22.2.2 -> 24.0.4 https://github.com/dbeaver/dbeaver/releases
 attrpath: dbeaver
@@ -171,7 +195,11 @@ Diff after rewrites:
 
 error: build log of 'dbeaver' is not available
 "#;
-        let result = analyze_log(log).unwrap();
+        let result = analyze_log(
+            log,
+            "https://nixpkgs-update-logs.nix-community.org/dbeaver/2024-05-16.log",
+        )
+        .unwrap();
         assert!(matches!(result, LogAnalysisResult::Failure));
     }
 
@@ -194,7 +222,55 @@ No auto update branch exists
 [updateScript] skipping because derivation has no updateScript
 The diff was empty after rewrites.
 "#;
-        let result = analyze_log(log).unwrap();
-        assert!(matches!(result, LogAnalysisResult::NoUpdater));
+        let result = analyze_log(
+            log,
+            "https://nixpkgs-update-logs.nix-community.org/stockfish/2025-05-13.log",
+        )
+        .unwrap();
+        assert!(matches!(result, LogAnalysisResult::Skip));
+    }
+
+    #[test]
+    fn test_analyze_log_infinite_recursion_betterleaks() {
+        let log = include_str!("../tests/fixtures/betterleaks-2026-07-04.log");
+        let result = analyze_log(
+            log,
+            "https://nixpkgs-update-logs.nix-community.org/betterleaks/2026-07-04.log",
+        )
+        .unwrap();
+        assert!(matches!(result, LogAnalysisResult::Skip));
+    }
+
+    #[test]
+    fn test_analyze_log_infinite_recursion_brush() {
+        let log = include_str!("../tests/fixtures/brush-2026-07-04.log");
+        let result = analyze_log(
+            log,
+            "https://nixpkgs-update-logs.nix-community.org/brush/2026-07-04.log",
+        )
+        .unwrap();
+        assert!(matches!(result, LogAnalysisResult::Skip));
+    }
+
+    #[test]
+    fn test_analyze_log_infinite_recursion_typescript_go() {
+        let log = include_str!("../tests/fixtures/typescript-go-2026-07-04.log");
+        let result = analyze_log(
+            log,
+            "https://nixpkgs-update-logs.nix-community.org/typescript-go/2026-07-04.log",
+        )
+        .unwrap();
+        assert!(matches!(result, LogAnalysisResult::Skip));
+    }
+
+    #[test]
+    fn test_analyze_log_infinite_recursion_other_date_fails() {
+        let log = include_str!("../tests/fixtures/betterleaks-2026-07-04.log");
+        let result = analyze_log(
+            log,
+            "https://nixpkgs-update-logs.nix-community.org/betterleaks/2026-07-05.log",
+        )
+        .unwrap();
+        assert!(matches!(result, LogAnalysisResult::Failure));
     }
 }

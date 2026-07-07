@@ -89,7 +89,7 @@ pub async fn check_package(client: &Client, pname: &str) -> Result<PackageCheckR
 
     let latest_log_url = log_urls[0].clone();
     let latest_log = client.get(&latest_log_url).send().await?.text().await?;
-    match log_analysis::analyze_log(&latest_log)? {
+    match log_analysis::analyze_log(&latest_log, &latest_log_url)? {
         log_analysis::LogAnalysisResult::Success { pr_url } => Ok(PackageCheckResult::Success {
             log_url: latest_log_url,
             pr_url,
@@ -97,7 +97,7 @@ pub async fn check_package(client: &Client, pname: &str) -> Result<PackageCheckR
         log_analysis::LogAnalysisResult::Failure => Ok(PackageCheckResult::Failure {
             log_url: latest_log_url,
         }),
-        log_analysis::LogAnalysisResult::NoUpdater => Ok(PackageCheckResult::Skip {
+        log_analysis::LogAnalysisResult::Skip => Ok(PackageCheckResult::Skip {
             log_url: latest_log_url,
         }),
     }
