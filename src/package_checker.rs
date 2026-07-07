@@ -97,7 +97,7 @@ pub async fn check_package(client: &Client, pname: &str) -> Result<PackageCheckR
         log_analysis::LogAnalysisResult::Failure => Ok(PackageCheckResult::Failure {
             log_url: latest_log_url,
         }),
-        log_analysis::LogAnalysisResult::NoUpdater => Ok(PackageCheckResult::Skip {
+        log_analysis::LogAnalysisResult::Skip => Ok(PackageCheckResult::Skip {
             log_url: latest_log_url,
         }),
     }
