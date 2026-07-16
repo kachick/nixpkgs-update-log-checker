@@ -4,5 +4,4 @@ rules:
       policies:
         kachick/*: any
         actions/*: any
-        NixOS/*: any
         crate-ci/*: any
