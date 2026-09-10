@@ -36,7 +36,10 @@ impl std::fmt::Display for PackageCheckResult {
                 write!(f, "\x1b[31m[FAILURE]\x1b[0m: log={log_url}")
             }
             PackageCheckResult::LogNotFound { log_list_url } => {
-                write!(f, "\x1b[33m[WARN]\x1b[0m: No logs found at {log_list_url}")
+                write!(
+                    f,
+                    "\x1b[33m[WARN]\x1b[0m: No logs found at {log_list_url} - test!"
+                )
             }
             PackageCheckResult::Skip { log_url } => {
                 write!(f, "\x1b[33m[WARN]\x1b[0m: Skipped log={log_url}")
