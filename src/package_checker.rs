@@ -1,5 +1,5 @@
 use anyhow::Result;
-use reqwest::Client;
+use ureq::Agent;
 use url::Url;
 
 use crate::log_analysis;
@@ -62,19 +62,18 @@ fn get_log_urls(raw_log_urls: &str, list_url: &Url) -> Result<Vec<String>> {
     Ok(log_urls)
 }
 
-pub async fn check_package(client: &Client, pname: &str) -> Result<PackageCheckResult> {
+pub fn check_package(agent: &Agent, pname: &str) -> Result<PackageCheckResult> {
     let log_list_url = Url::parse(&format!(
         // Should specify last "/"
         "https://nixpkgs-update-logs.nix-community.org/{pname}/"
     ))
     .map_err(|e| anyhow::anyhow!("Failed to parse log list URL: {e}"))?;
 
-    let raw_log_urls = client
+    let raw_log_urls = agent
         .get(log_list_url.as_str())
-        .send()
-        .await?
-        .text()
-        .await?;
+        .call()?
+        .body_mut()
+        .read_to_string()?;
 
     let log_urls = get_log_urls(&raw_log_urls, &log_list_url)
         .map_err(|e| anyhow::anyhow!("Failed to fetch logs: {e}"))?;
@@ -86,7 +85,11 @@ pub async fn check_package(client: &Client, pname: &str) -> Result<PackageCheckR
     }
 
     let latest_log_url = log_urls[0].clone();
-    let latest_log = client.get(&latest_log_url).send().await?.text().await?;
+    let latest_log = agent
+        .get(&latest_log_url)
+        .call()?
+        .body_mut()
+        .read_to_string()?;
     match log_analysis::analyze_log(&latest_log, &latest_log_url)? {
         log_analysis::LogAnalysisResult::Success { pr_url } => Ok(PackageCheckResult::Success {
             log_url: latest_log_url,

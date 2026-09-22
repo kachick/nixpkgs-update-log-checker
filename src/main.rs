@@ -1,21 +1,25 @@
 use anyhow::Result;
-use futures::future::join_all;
-use reqwest::Client;
 
 mod cli;
 mod log_analysis;
 mod package_checker;
 
-#[tokio::main]
-async fn main() -> Result<()> {
+fn main() -> Result<()> {
     let packages = cli::parse_cli_args()?;
-    let client = Client::builder().build()?;
-    let results = join_all(
-        packages
+    let config = ureq::config::Config::default();
+    let agent = ureq::Agent::new_with_config(config);
+
+    let results = std::thread::scope(|s| {
+        let handles: Vec<_> = packages
             .iter()
-            .map(|pkg| package_checker::check_package(&client, pkg)),
-    )
-    .await;
+            .map(|pkg| s.spawn(|| package_checker::check_package(&agent, pkg)))
+            .collect();
+
+        handles
+            .into_iter()
+            .map(|h| h.join().expect("Thread panicked"))
+            .collect::<Vec<_>>()
+    });
 
     let mut has_unexpected_error = false;
 
