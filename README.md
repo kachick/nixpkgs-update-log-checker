@@ -7,10 +7,11 @@ Tracker for automatic updates in nixpkgs
 ### Basics
 
 ```plaintext
-Usage: nixpkgs-update-log-checker --packages <packages>...
+Usage: nixpkgs-update-log-checker [OPTIONS] --packages <PACKAGES>...
 
 Options:
-  -p, --packages <packages>...  List of package names to check
+  -p, --packages <PACKAGES>...  List of package names to check
+      --fail-on-warning         Exit with failure if any warning is encountered
 ```
 
 ### Flake

@@ -21,6 +21,19 @@ pub enum PackageCheckResult {
     },
 }
 
+impl PackageCheckResult {
+    pub fn is_warning(&self) -> bool {
+        matches!(
+            self,
+            PackageCheckResult::LogNotFound { .. } | PackageCheckResult::Skip { .. }
+        )
+    }
+
+    pub fn is_failure(&self) -> bool {
+        matches!(self, PackageCheckResult::Failure { .. })
+    }
+}
+
 impl std::fmt::Display for PackageCheckResult {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -77,10 +90,6 @@ fn check_package_with_base_url(
         .join(&format!("{pname}/"))
         .map_err(|e| anyhow::anyhow!("Failed to parse log list URL: {e}"))?;
 
-    // HTTP 404 is technically an error, but nixpkgs-update-logs returns 404 when no logs
-    // exist for the given package. For the primary use cases of this tool, treating a missing
-    // package log as a warning (LogNotFound) is preferred over a fatal error.
-    // In the future, this may be made configurable (e.g. via a CLI flag to treat missing logs as errors).
     let raw_log_urls = match agent.get(log_list_url.as_str()).call() {
         Ok(mut res) => res.body_mut().read_to_string()?,
         Err(ureq::Error::StatusCode(404)) => {
@@ -234,5 +243,34 @@ mod tests {
         handle.join().unwrap();
 
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_package_check_result_predicates() {
+        let warn_not_found = PackageCheckResult::LogNotFound {
+            log_list_url: "url".to_string(),
+        };
+        let warn_skip = PackageCheckResult::Skip {
+            log_url: "url".to_string(),
+        };
+        let failure = PackageCheckResult::Failure {
+            log_url: "url".to_string(),
+        };
+        let success = PackageCheckResult::Success {
+            log_url: "url".to_string(),
+            pr_url: None,
+        };
+
+        assert!(warn_not_found.is_warning());
+        assert!(!warn_not_found.is_failure());
+
+        assert!(warn_skip.is_warning());
+        assert!(!warn_skip.is_failure());
+
+        assert!(!failure.is_warning());
+        assert!(failure.is_failure());
+
+        assert!(!success.is_warning());
+        assert!(!success.is_failure());
     }
 }
