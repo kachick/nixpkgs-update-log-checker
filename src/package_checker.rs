@@ -63,17 +63,33 @@ fn get_log_urls(raw_log_urls: &str, list_url: &Url) -> Result<Vec<String>> {
 }
 
 pub fn check_package(agent: &Agent, pname: &str) -> Result<PackageCheckResult> {
-    let log_list_url = Url::parse(&format!(
-        // Should specify last "/"
-        "https://nixpkgs-update-logs.nix-community.org/{pname}/"
-    ))
-    .map_err(|e| anyhow::anyhow!("Failed to parse log list URL: {e}"))?;
+    let base_url = Url::parse("https://nixpkgs-update-logs.nix-community.org/")
+        .map_err(|e| anyhow::anyhow!("Failed to parse base URL: {e}"))?;
+    check_package_with_base_url(agent, &base_url, pname)
+}
 
-    let raw_log_urls = agent
-        .get(log_list_url.as_str())
-        .call()?
-        .body_mut()
-        .read_to_string()?;
+fn check_package_with_base_url(
+    agent: &Agent,
+    base_url: &Url,
+    pname: &str,
+) -> Result<PackageCheckResult> {
+    let log_list_url = base_url
+        .join(&format!("{pname}/"))
+        .map_err(|e| anyhow::anyhow!("Failed to parse log list URL: {e}"))?;
+
+    // HTTP 404 is technically an error, but nixpkgs-update-logs returns 404 when no logs
+    // exist for the given package. For the primary use cases of this tool, treating a missing
+    // package log as a warning (LogNotFound) is preferred over a fatal error.
+    // In the future, this may be made configurable (e.g. via a CLI flag to treat missing logs as errors).
+    let raw_log_urls = match agent.get(log_list_url.as_str()).call() {
+        Ok(mut res) => res.body_mut().read_to_string()?,
+        Err(ureq::Error::StatusCode(404)) => {
+            return Ok(PackageCheckResult::LogNotFound {
+                log_list_url: log_list_url.to_string(),
+            });
+        }
+        Err(err) => return Err(err.into()),
+    };
 
     let log_urls = get_log_urls(&raw_log_urls, &log_list_url)
         .map_err(|e| anyhow::anyhow!("Failed to fetch logs: {e}"))?;
@@ -165,5 +181,58 @@ mod tests {
         let list_url = Url::parse("https://example.com/logs/").unwrap();
         let result = get_log_urls(raw_log_urls, &list_url).unwrap();
         assert!(result.is_empty());
+    }
+
+    #[test]
+    fn test_check_package_with_base_url_not_found() {
+        let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let port = listener.local_addr().unwrap().port();
+
+        let handle = std::thread::spawn(move || {
+            if let Ok((mut stream, _)) = listener.accept() {
+                use std::io::Write;
+                let response =
+                    "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n";
+                let _ = stream.write_all(response.as_bytes());
+            }
+        });
+
+        let agent = ureq::Agent::new_with_config(ureq::config::Config::default());
+        let base_url = Url::parse(&format!("http://127.0.0.1:{port}/")).unwrap();
+        let result = check_package_with_base_url(&agent, &base_url, "typescript_7").unwrap();
+
+        handle.join().unwrap();
+
+        match result {
+            PackageCheckResult::LogNotFound { log_list_url } => {
+                assert_eq!(
+                    log_list_url,
+                    format!("http://127.0.0.1:{port}/typescript_7/")
+                );
+            }
+            _ => panic!("Expected LogNotFound, got {result:?}"),
+        }
+    }
+
+    #[test]
+    fn test_check_package_with_base_url_server_error() {
+        let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let port = listener.local_addr().unwrap().port();
+
+        let handle = std::thread::spawn(move || {
+            if let Ok((mut stream, _)) = listener.accept() {
+                use std::io::Write;
+                let response = "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\nConnection: close\r\n\r\n";
+                let _ = stream.write_all(response.as_bytes());
+            }
+        });
+
+        let agent = ureq::Agent::new_with_config(ureq::config::Config::default());
+        let base_url = Url::parse(&format!("http://127.0.0.1:{port}/")).unwrap();
+        let result = check_package_with_base_url(&agent, &base_url, "typescript_7");
+
+        handle.join().unwrap();
+
+        assert!(result.is_err());
     }
 }
