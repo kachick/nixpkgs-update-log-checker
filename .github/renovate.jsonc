@@ -1,0 +1,33 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "dependencyDashboard": true,
+  // Cargo updates were migrated from Dependabot due to:
+  // - https://github.com/dependabot/dependabot-core/issues/4009 (unstable versioning-strategy: increase)
+  // - https://github.com/dependabot/dependabot-core/issues/14196 (Cargo.lock updated without updating Cargo.toml, keeping outdated manifests and blocking vulnerability updates)
+  // Keep the default rangeStrategy ("auto", which defaults to "update-lockfile" for Cargo):
+  // - Retains loose caret constraints (e.g. "1.0") in Cargo.toml while keeping Cargo.lock up to date.
+  // - Automatically updates Cargo.toml only when an update exceeds the current SemVer range (e.g. breaking/major updates).
+  // - Note: This repository produces an end-product CLI binary, so bumping minimum requirements
+  //   would not break downstream crates, but keeping clean manifest ranges is preferred.
+  "enabledManagers": [
+    "cargo",
+    "custom.regex",
+  ],
+  "extends": [
+    "github>kachick/renovate-config-dprint#1.3.0",
+    "github>kachick/renovate-config-dprint:self",
+  ],
+  "labels": [
+    "dependencies",
+    "renovate",
+  ],
+  "nix": {
+    "enabled": false,
+  },
+  "ignoreDeps": [
+    "crate-ci/typos",
+  ],
+  "schedule": [
+    "on Friday",
+  ],
+}

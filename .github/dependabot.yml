@@ -16,9 +16,8 @@ updates:
       - dependency-name: 'crate-ci/typos'
     cooldown:
       default-days: 3
-  - package-ecosystem: cargo
-    directory: /
-    schedule:
-      interval: weekly
-    cooldown:
-      default-days: 3
+  # Cargo updates were migrated to Renovatebot.
+  # Dependabot had critical issues with cargo:
+  # - https://github.com/dependabot/dependabot-core/issues/4009: `versioning-strategy: increase` causes runtime errors.
+  # - https://github.com/dependabot/dependabot-core/issues/14196: Dependabot updates Cargo.lock without updating Cargo.toml,
+  #   leaving outdated version requirements in Cargo.toml and preventing lockfile updates for security vulnerabilities.
