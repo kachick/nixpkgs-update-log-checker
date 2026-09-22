@@ -1,6 +1,5 @@
 use anyhow::Result;
 use reqwest::Client;
-use scraper::{Html, Selector};
 use url::Url;
 
 use crate::log_analysis;
@@ -45,17 +44,16 @@ impl std::fmt::Display for PackageCheckResult {
     }
 }
 
-// Returns all log URLs for a package, and sorted with LIFO order.
+// The target server responds with a simple directory listing (like nginx/caddy autoindex),
+// rather than complex rich HTML. We extract href attributes pointing to *.log directly using
+// simple string parsing instead of pulling in a heavy HTML parser crate.
+// Returns all log URLs for a package, sorted in LIFO order.
 fn get_log_urls(raw_log_urls: &str, list_url: &Url) -> Result<Vec<String>> {
-    let html = Html::parse_document(raw_log_urls);
-    let anchor =
-        Selector::parse("a").map_err(|e| anyhow::anyhow!("Failed to parse selector 'a': {e}"))?;
-
-    let hrefs = html.select(&anchor).filter_map(|a| a.value().attr("href"));
-
-    let log_hrefs = hrefs.filter(|href| href.ends_with(".log"));
-
-    let mut log_urls: Vec<_> = log_hrefs
+    let mut log_urls: Vec<String> = raw_log_urls
+        .split("href=\"")
+        .skip(1)
+        .filter_map(|part| part.split_once('"').map(|(href, _)| href))
+        .filter(|href| href.ends_with(".log"))
         .filter_map(|href| list_url.join(href).ok())
         .map(|url| url.to_string())
         .collect();
