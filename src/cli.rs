@@ -1,22 +1,19 @@
-use anyhow::Result;
-use clap::{Arg, Command};
+use clap::Parser;
 
-pub fn parse_cli_args() -> Result<Vec<String>> {
-    let matches = Command::new("nixpkgs-update-log-checker")
-        .version(env!("CARGO_PKG_VERSION"))
-        .arg(
-            Arg::new("packages")
-                .long("packages")
-                .short('p')
-                .help("List of package names to check")
-                .num_args(1..)
-                .required(true),
-        )
-        .get_matches();
+#[derive(Parser, Debug)]
+#[command(version)]
+struct Cli {
+    #[arg(
+        short = 'p',
+        long = "packages",
+        help = "List of package names to check",
+        num_args = 1..,
+        required = true
+    )]
+    packages: Vec<String>,
+}
 
-    Ok(matches
-        .get_many::<String>("packages")
-        .unwrap()
-        .map(|s| s.to_string())
-        .collect())
+pub fn parse_cli_args() -> anyhow::Result<Vec<String>> {
+    let cli = Cli::parse();
+    Ok(cli.packages)
 }
