@@ -16,14 +16,14 @@ Options:
 
 ### Flake
 
-```console
+```bash
 nix run github:kachick/nixpkgs-update-log-checker -- --packages pname
 ```
 
 ### Your maintained packages
 
 ```bash
-pnames="$(NIX_PATH=nixpkgs=channel:nixpkgs-unstable nix run github:kachick/nixpkgs-maintained-by -- -id kachick)" 
+pnames="$(NIX_PATH=nixpkgs=channel:nixpkgs-unstable nix run github:kachick/nixpkgs-maintained-by -- -id kachick)"
 echo "$pnames" | xargs nix run github:kachick/nixpkgs-update-log-checker -- --packages
 ```
 

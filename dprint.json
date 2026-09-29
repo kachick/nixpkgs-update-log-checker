@@ -2,6 +2,15 @@
   "json": {
   },
   "markdown": {
+    "tags": {
+      "nix": "nix",
+      "sh": "sh",
+      "bash": "bash",
+      "zsh": "zsh",
+      "envrc": "bash",
+      "shell": "sh",
+      "shell-script": "sh"
+    }
   },
   "toml": {
   },
