@@ -9,12 +9,7 @@
     "quotes": "preferSingle",
     "trimTrailingWhitespaces": false
   },
-  "excludes": [
-    ".direnv",
-    "target",
-    "tmp",
-    "**/*-lock.json"
-  ],
+  "excludes": [],
   "plugins": [
     "npm:@dprint/json@0.25.0",
     "npm:@dprint/markdown@0.24.0",
