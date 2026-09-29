@@ -19,6 +19,7 @@ jobs:
       - uses: dprint/check@7dc032d8874778fc024f6f9b4a7e6d896782c330 # v2.5
         with:
           dprint-version: '0.57.4' # selfup {"extract":"\\d[^']+","replacer":["dprint", "--version"], "nth": 2}
+          cache: true
 
   typos:
     timeout-minutes: 15
