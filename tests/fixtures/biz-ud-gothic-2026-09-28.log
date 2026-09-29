@@ -1,0 +1,18 @@
+Running nixpkgs-update (https://nix-community.org/update-bot/) with UPDATE_INFO: biz-ud-gothic 0 -> 1
+attrpath: biz-ud-gothic
+Checking auto update branch...
+[version] 
+[version] skipping because derivation has updateScript
+[rustCrateVersion] 
+[rustCrateVersion] No cargoHash found
+[golangModuleVersion] 
+[golangModuleVersion] Not a buildGoModule package with vendorHash
+[npmDepsVersion] 
+[npmDepsVersion] No npmDepsHash
+[updateScript] 
+[updateScript] Failed with exit code 1
+this derivation will be built:
+  /nix/store/g6yswwih3yy1r0w35ndhw0d38w1s39s0-packages.json.drv
+error: the build users group 'nixbld' has no members
+
+

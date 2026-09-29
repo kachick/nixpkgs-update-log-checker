@@ -11,6 +11,13 @@ pub fn analyze_log(raw: &str, log_url: &str) -> Result<LogAnalysisResult> {
         return Ok(LogAnalysisResult::Skip);
     }
 
+    // See: https://github.com/NixOS/infra/pull/1226#issuecomment-5868033490
+    if log_url.contains("/2026-09-28.log")
+        && raw.contains("error: the build users group 'nixbld' has no members")
+    {
+        return Ok(LogAnalysisResult::Skip);
+    }
+
     let lines: Vec<&str> = raw.trim_end().lines().collect();
 
     // Should return early. See GH-6
@@ -269,6 +276,28 @@ The diff was empty after rewrites.
         let result = analyze_log(
             log,
             "https://nixpkgs-update-logs.nix-community.org/betterleaks/2026-07-05.log",
+        )
+        .unwrap();
+        assert!(matches!(result, LogAnalysisResult::Failure));
+    }
+
+    #[test]
+    fn test_analyze_log_nixbld_no_members_biz_ud_gothic() {
+        let log = include_str!("../tests/fixtures/biz-ud-gothic-2026-09-28.log");
+        let result = analyze_log(
+            log,
+            "https://nixpkgs-update-logs.nixos.org/biz-ud-gothic/2026-09-28.log",
+        )
+        .unwrap();
+        assert!(matches!(result, LogAnalysisResult::Skip));
+    }
+
+    #[test]
+    fn test_analyze_log_nixbld_no_members_other_date_fails() {
+        let log = include_str!("../tests/fixtures/biz-ud-gothic-2026-09-28.log");
+        let result = analyze_log(
+            log,
+            "https://nixpkgs-update-logs.nixos.org/biz-ud-gothic/2026-09-29.log",
         )
         .unwrap();
         assert!(matches!(result, LogAnalysisResult::Failure));
