@@ -36,19 +36,19 @@ For example: [nixpkgs-health-check-action](https://github.com/kachick/nixpkgs-he
 ## Limitation
 
 - The log analysis is based on experience, so it might give wrong results if it sees a pattern I’m not familiar with.
-- Ideally we should respect [these skipped logs](https://github.com/nix-community/nixpkgs-update/blob/363f92cdbbf57bb13eec95c22c2b068d45fa2cea/src/Skiplist.hs#L168),
+- Ideally we should respect [these skipped logs](https://github.com/NixOS/nixpkgs-update/blob/363f92cdbbf57bb13eec95c22c2b068d45fa2cea/src/Skiplist.hs#L168),
   however supporting the small subset of it
 
 ## Resources
 
 - [List of update logs](https://nixpkgs-update-logs.nix-community.org/)
-- [Upstream](https://github.com/nix-community/nixpkgs-update)
-- [Notifier](https://github.com/nix-community/nixpkgs-update/issues/476)
+- [Upstream](https://github.com/NixOS/nixpkgs-update)
+- [Notifier](https://github.com/NixOS/nixpkgs-update/issues/476)
 
 ## Motivation
 
 I wanted to keep track of the packages I maintain or depend on.\
-Another reason is that I came across [this text](https://github.com/nix-community/nixpkgs-update/blob/363f92cdbbf57bb13eec95c22c2b068d45fa2cea/doc/details.md?plain=1#L64-L67).
+Another reason is that I came across [this text](https://github.com/NixOS/nixpkgs-update/blob/363f92cdbbf57bb13eec95c22c2b068d45fa2cea/doc/details.md?plain=1#L64-L67).
 
 > There are a lot of packages `nixpkgs-update` currently has no hope of updating.\
 > Please dredge the logs to find out why your pet package is not receiving updates.
