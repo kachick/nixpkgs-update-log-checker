@@ -6,6 +6,8 @@ runs:
     - name: Install Nix
       uses: NixOS/nix-installer-action@62c1943b776c509394b550f3f983adc14e9212d6 # v1.0.0
       with:
+        # access-tokens: Prevent GitHub API rate limiting during `nix run github:`
         extra-conf: |
-          sandbox = true
-          accept-flake-config = true
+          access-tokens = github.com=${{ github.token }}
+          extra-substituters = https://selfup.cachix.org
+          extra-trusted-public-keys = selfup.cachix.org-1:eY2eEd955BmRI7SultbRIV81vApqpJixunkV3XlXuT8=
