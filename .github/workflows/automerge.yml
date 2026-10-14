@@ -1,0 +1,18 @@
+name: 🤖👌🤖
+
+permissions:
+  contents: read
+
+on:
+  schedule:
+    # Run every 2 hours at minute 17 to avoid traffic peaks
+    - cron: '17 */2 * * *'
+  workflow_dispatch:
+
+jobs:
+  automerge:
+    uses: kachick/workflows/.github/workflows/reusable-automerge.yml@main
+    with:
+      app-id: ${{ vars.SAMU_APP_ID }}
+    secrets:
+      APP_PRIVATE_KEY: ${{ secrets.SAMU_APP_PRIVATE_KEY }}
