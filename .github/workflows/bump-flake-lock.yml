@@ -1,0 +1,22 @@
+name: 🤖🆙❄️
+
+permissions:
+  contents: read
+
+on:
+  schedule:
+    # Every 10:17(JST) on Monday
+    # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
+    # You can see what the cron expression means at https://crontab.guru/
+    - cron: '17 1 * * 1'
+  workflow_dispatch:
+
+jobs:
+  bump:
+    uses: kachick/workflows/.github/workflows/reusable-bump-flake-lock.yml@main
+    with:
+      app-id: ${{ vars.SAMU_APP_ID }}
+      post-commit-lock-file: nix develop --command bash -c "git ls-files | xargs nix run github:kachick/selfup/v1.3.1 -- run"
+      post-commit-lock-file-title: 'Sync CI dependencies with nixpkgs'
+    secrets:
+      APP_PRIVATE_KEY: ${{ secrets.SAMU_APP_PRIVATE_KEY }}
