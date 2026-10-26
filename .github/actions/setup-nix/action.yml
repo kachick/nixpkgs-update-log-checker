@@ -9,5 +9,5 @@ runs:
         # access-tokens: Prevent GitHub API rate limiting during `nix run github:`
         extra-conf: |
           access-tokens = github.com=${{ github.token }}
-          extra-substituters = https://selfup.cachix.org
-          extra-trusted-public-keys = selfup.cachix.org-1:eY2eEd955BmRI7SultbRIV81vApqpJixunkV3XlXuT8=
+          extra-substituters = https://kachick.cachix.org
+          extra-trusted-public-keys = kachick.cachix.org-1:7giZGKW03gPFkbde09JNpDKCbDGGwBuU/Z11W/jUtEQ=
