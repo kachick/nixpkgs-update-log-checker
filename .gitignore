@@ -1,6 +1,7 @@
 /target
 
 .direnv
+.vscode/
 
 result
 
