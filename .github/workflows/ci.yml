@@ -63,7 +63,7 @@ jobs:
           persist-credentials: false
       - uses: $/.github/actions/setup-nix
       - run: echo 'This step should be done before any other "nix develop" steps to measure the setup time'
-      - uses: actions/cache@v6
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: |
             ~/.cargo/bin/
