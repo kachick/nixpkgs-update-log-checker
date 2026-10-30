@@ -10,5 +10,5 @@ description = "CLI to check the update log of nixpkgs"
 [dependencies]
 anyhow = "1.0.104"
 clap = { version = "4.6.7", features = ["derive"] }
-ureq = "3.4.2"
+ureq = "3.5.0"
 url = "2.5.8"
