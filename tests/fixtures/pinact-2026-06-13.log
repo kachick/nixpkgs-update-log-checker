@@ -1,0 +1,71 @@
+Running nixpkgs-update (https://nix-community.org/update-bot/) with UPDATE_INFO: pinact 4.0.0 -> 4.1.0 https://github.com/suzuki-shunsuke/pinact/releases
+attrpath: pinact
+Checking auto update branch...
+[version] 
+[version] generic version rewriter does not support multiple hashes
+[rustCrateVersion] 
+[rustCrateVersion] No cargoHash found
+[golangModuleVersion] 
+[golangModuleVersion] skipping because derivation has updateScript
+[npmDepsVersion] 
+[npmDepsVersion] No npmDepsHash
+[updateScript] 
+[updateScript] Failed with exit code 1
+this derivation will be built:
+  /nix/store/zfwk805xk23s2n6cvnbxcp4axj844p0a-packages.json.drv
+building '/nix/store/zfwk805xk23s2n6cvnbxcp4axj844p0a-packages.json.drv'...
+
+Going to be running update for following packages:
+ - pinact-4.0.0
+
+Press Enter key to continue...
+Running update for:
+Enqueuing group of 1 packages
+ - pinact-4.0.0: UPDATING ...
+ - pinact-4.0.0: ERROR
+
+--- SHOWING ERROR LOG FOR pinact-4.0.0 ----------------------
+
+Traceback (most recent call last):
+  File "/nix/store/dvx45mxbldhdkcxcvnh1ph6qm8x4s1n6-nix-update-1.15.1/bin/.nix-update-wrapped", line 9, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/nix/store/dvx45mxbldhdkcxcvnh1ph6qm8x4s1n6-nix-update-1.15.1/lib/python3.13/site-packages/nix_update/__init__.py", line 475, in main
+    package = update(options)
+  File "/nix/store/dvx45mxbldhdkcxcvnh1ph6qm8x4s1n6-nix-update-1.15.1/lib/python3.13/site-packages/nix_update/update.py", line 234, in update
+    update_dependency_hashes(opts, package, update_hash=update_hash)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/dvx45mxbldhdkcxcvnh1ph6qm8x4s1n6-nix-update-1.15.1/lib/python3.13/site-packages/nix_update/dependency_hashes.py", line 181, in update_dependency_hashes
+    updater(opts, package.filename, dep_value)
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/dvx45mxbldhdkcxcvnh1ph6qm8x4s1n6-nix-update-1.15.1/lib/python3.13/site-packages/nix_update/dependency_hashes.py", line 102, in update_hash_with_prefetch
+    target_hash = nix_prefetch(opts, attr_name)
+  File "/nix/store/dvx45mxbldhdkcxcvnh1ph6qm8x4s1n6-nix-update-1.15.1/lib/python3.13/site-packages/nix_update/dependency_hashes.py", line 91, in nix_prefetch
+    raise UpdateError(msg)
+nix_update.errors.UpdateError: failed to retrieve hash when trying to update pinact.goModules
+--- nix stderr (last 20 lines) ---
+Running phase: patchPhase
+Running phase: updateAutotoolsGnuConfigScriptsPhase
+Running phase: configurePhase
+Running phase: buildPhase
+go: go.mod requires go >= 1.26.4 (running go 1.26.3; GOTOOLCHAIN=local)
+error: Cannot build '/nix/store/slpiv8j2130fw9wq3rb2p0j1r9zd16bj-pinact-4.1.0-go-modules.drv'.
+       Reason: builder failed with exit code 1.
+       Output paths:
+         /nix/store/m989kackd1h8j65525s49f83gpr58i3w-pinact-4.1.0-go-modules
+       Last 8 log lines:
+       > Running phase: unpackPhase
+       > unpacking source archive /nix/store/2r3d3zx2zradb37ml7gq8sbg2dqcam13-source
+       > source root is source
+       > Running phase: patchPhase
+       > Running phase: updateAutotoolsGnuConfigScriptsPhase
+       > Running phase: configurePhase
+       > Running phase: buildPhase
+       > go: go.mod requires go >= 1.26.4 (running go 1.26.3; GOTOOLCHAIN=local)
+       For full logs, run:
+         nix log /nix/store/slpiv8j2130fw9wq3rb2p0j1r9zd16bj-pinact-4.1.0-go-modules.drv
+
+
+--- SHOWING ERROR LOG FOR pinact-4.0.0 ----------------------
+The update script for pinact-4.0.0 failed with exit code 1
+

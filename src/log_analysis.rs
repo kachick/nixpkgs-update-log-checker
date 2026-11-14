@@ -374,4 +374,26 @@ reason = "Waiting for next run"
         .unwrap();
         assert!(matches!(next_run, LogAnalysisResult::Failure));
     }
+
+    #[test]
+    fn test_analyze_log_with_rules_real_pinact_go_version_delay() {
+        let log = include_str!("../tests/fixtures/pinact-2026-06-13.log");
+        let rules = crate::config::parse_ignore_rules(
+            r#"
+[[ignore]]
+pattern = 'go: go\.mod requires go >= [0-9.]+'
+reason = "Allow Go version delay"
+"#,
+        )
+        .unwrap();
+
+        let result = analyze_log_with_rules(
+            log,
+            "https://nixpkgs-update-logs.nix-community.org/pinact/2026-06-13.log",
+            "pinact",
+            &rules,
+        )
+        .unwrap();
+        assert!(matches!(result, LogAnalysisResult::Skip));
+    }
 }
