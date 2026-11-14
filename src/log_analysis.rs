@@ -336,7 +336,7 @@ reason = "Allow Go version delay"
         let log = "pinact 1.0.0 -> 1.1.0\nnix build failed.\ngo: go.mod requires go >= 1.25 (running go 1.24)";
         let result = analyze_log_with_rules(
             log,
-            "https://nixpkgs-update-logs.nix-community.org/pinact/2026-11-10.log",
+            "https://nixpkgs-update-logs.nixos.org/pinact/2026-11-10.log",
             "pinact",
             &rules,
         )
@@ -349,7 +349,7 @@ reason = "Allow Go version delay"
         let rules = crate::config::parse_ignore_rules(
             r#"
 [[ignore]]
-url = "https://nixpkgs-update-logs.nix-community.org/fresh-editor/2026-11-10.log"
+url = "https://nixpkgs-update-logs.nixos.org/fresh-editor/2026-11-10.log"
 reason = "Waiting for next run"
 "#,
         )
@@ -358,7 +358,7 @@ reason = "Waiting for next run"
         let log = "nix build failed.";
         let skipped = analyze_log_with_rules(
             log,
-            "https://nixpkgs-update-logs.nix-community.org/fresh-editor/2026-11-10.log",
+            "https://nixpkgs-update-logs.nixos.org/fresh-editor/2026-11-10.log",
             "fresh-editor",
             &rules,
         )
@@ -367,7 +367,7 @@ reason = "Waiting for next run"
 
         let next_run = analyze_log_with_rules(
             log,
-            "https://nixpkgs-update-logs.nix-community.org/fresh-editor/2026-11-12.log",
+            "https://nixpkgs-update-logs.nixos.org/fresh-editor/2026-11-12.log",
             "fresh-editor",
             &rules,
         )
@@ -389,7 +389,7 @@ reason = "Allow Go version delay"
 
         let result = analyze_log_with_rules(
             log,
-            "https://nixpkgs-update-logs.nix-community.org/pinact/2026-06-13.log",
+            "https://nixpkgs-update-logs.nixos.org/pinact/2026-06-13.log",
             "pinact",
             &rules,
         )

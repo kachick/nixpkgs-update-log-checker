@@ -81,7 +81,7 @@ pub fn check_package(
     pname: &str,
     ignore_rules: &[IgnoreRule],
 ) -> Result<PackageCheckResult> {
-    let base_url = Url::parse("https://nixpkgs-update-logs.nix-community.org/")
+    let base_url = Url::parse("https://nixpkgs-update-logs.nixos.org/")
         .map_err(|e| anyhow::anyhow!("Failed to parse base URL: {e}"))?;
     check_package_with_base_url(agent, &base_url, pname, ignore_rules)
 }

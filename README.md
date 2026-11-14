@@ -25,7 +25,7 @@ pattern = "go: go\\.mod requires go >="
 reason = "Allow Go version delay across packages"
 
 [[ignore]]
-url = "https://nixpkgs-update-logs.nix-community.org/fresh-editor/2026-11-10.log"
+url = "https://nixpkgs-update-logs.nixos.org/fresh-editor/2026-11-10.log"
 packages = ["fresh-editor"] # Optional: restrict to listed packages
 reason = "Fix merged, waiting for next run"
 ```
@@ -57,7 +57,7 @@ For example: [nixpkgs-health-check-action](https://github.com/kachick/nixpkgs-he
 
 ## Resources
 
-- [List of update logs](https://nixpkgs-update-logs.nix-community.org/)
+- [List of update logs](https://nixpkgs-update-logs.nixos.org/)
 - [Upstream](https://github.com/NixOS/nixpkgs-update)
 - [Notifier](https://github.com/NixOS/nixpkgs-update/issues/476)
 

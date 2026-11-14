@@ -113,7 +113,7 @@ pattern = "go: updates to go\\.mod needed|go .* is required"
 reason = "Allow Go version delay"
 
 [[ignore]]
-url = "https://nixpkgs-update-logs.nix-community.org/fresh-editor/2026-11-10.log"
+url = "https://nixpkgs-update-logs.nixos.org/fresh-editor/2026-11-10.log"
 packages = ["fresh-editor"]
 reason = "Fixed upstream"
 "#;
@@ -126,12 +126,12 @@ reason = "Fixed upstream"
 
         assert!(rules[1].matches(
             "fresh-editor",
-            "https://nixpkgs-update-logs.nix-community.org/fresh-editor/2026-11-10.log",
+            "https://nixpkgs-update-logs.nixos.org/fresh-editor/2026-11-10.log",
             "nix build failed."
         ));
         assert!(!rules[1].matches(
             "other-pkg",
-            "https://nixpkgs-update-logs.nix-community.org/fresh-editor/2026-11-10.log",
+            "https://nixpkgs-update-logs.nixos.org/fresh-editor/2026-11-10.log",
             "nix build failed."
         ));
     }
