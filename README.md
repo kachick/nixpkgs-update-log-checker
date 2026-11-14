@@ -20,11 +20,11 @@ Options:
 You can ignore logs by regex pattern or exact log URL using `--config`:
 
 ```toml
-[[nixpkgs-update.ignore]]
+[[ignore]]
 pattern = "go: go\\.mod requires go >="
 reason = "Allow Go version delay across packages"
 
-[[nixpkgs-update.ignore]]
+[[ignore]]
 url = "https://nixpkgs-update-logs.nix-community.org/fresh-editor/2026-11-10.log"
 packages = ["fresh-editor"] # Optional: restrict to listed packages
 reason = "Fix merged, waiting for next run"

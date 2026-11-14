@@ -4,14 +4,8 @@ use serde::Deserialize;
 use std::path::Path;
 
 #[derive(Debug, Deserialize, Default)]
+#[serde(deny_unknown_fields)]
 struct RootConfig {
-    // Allow other top-level sections such as [skip] or [hydra] in shared config files.
-    #[serde(rename = "nixpkgs-update", default)]
-    nixpkgs_update: NixpkgsUpdateConfig,
-}
-
-#[derive(Debug, Deserialize, Default)]
-struct NixpkgsUpdateConfig {
     #[serde(default)]
     ignore: Vec<RawIgnoreRule>,
 }
@@ -63,8 +57,7 @@ pub fn load_ignore_rules(path: &Path) -> Result<Vec<IgnoreRule>> {
 
 pub fn parse_ignore_rules(toml_str: &str) -> Result<Vec<IgnoreRule>> {
     let root: RootConfig = toml::from_str(toml_str)?;
-    root.nixpkgs_update
-        .ignore
+    root.ignore
         .into_iter()
         .enumerate()
         .map(|(idx, raw)| compile_rule(idx, raw))
@@ -113,20 +106,13 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_parse_shared_config_ignores_other_sections() {
+    fn test_parse_ignore_rules() {
         let toml = r#"
-[skip]
-hello = { hydra = "Test skip" }
-
-[[hydra.ignore]]
-url = "https://hydra.nixos.org/build/123"
-reason = "Upstream patch merged"
-
-[[nixpkgs-update.ignore]]
+[[ignore]]
 pattern = "go: updates to go\\.mod needed|go .* is required"
 reason = "Allow Go version delay"
 
-[[nixpkgs-update.ignore]]
+[[ignore]]
 url = "https://nixpkgs-update-logs.nix-community.org/fresh-editor/2026-11-10.log"
 packages = ["fresh-editor"]
 reason = "Fixed upstream"
@@ -151,19 +137,24 @@ reason = "Fixed upstream"
     }
 
     #[test]
-    fn test_parse_empty_config_without_nixpkgs_update() {
+    fn test_parse_empty_config() {
+        let rules = parse_ignore_rules("").unwrap();
+        assert!(rules.is_empty());
+    }
+
+    #[test]
+    fn test_rejects_unknown_top_level_field() {
         let toml = r#"
 [skip]
 hello = { hydra = "Test skip" }
 "#;
-        let rules = parse_ignore_rules(toml).unwrap();
-        assert!(rules.is_empty());
+        assert!(parse_ignore_rules(toml).is_err());
     }
 
     #[test]
     fn test_rejects_unknown_field_in_rule() {
         let toml = r#"
-[[nixpkgs-update.ignore]]
+[[ignore]]
 url = "https://example.com/a.log"
 unknown_key = "oops"
 "#;
@@ -173,7 +164,7 @@ unknown_key = "oops"
     #[test]
     fn test_rejects_rule_without_url_or_pattern() {
         let toml = r#"
-[[nixpkgs-update.ignore]]
+[[ignore]]
 packages = ["pinact"]
 reason = "Missing condition"
 "#;
@@ -183,7 +174,7 @@ reason = "Missing condition"
     #[test]
     fn test_rejects_invalid_regex() {
         let toml = r#"
-[[nixpkgs-update.ignore]]
+[[ignore]]
 pattern = "[unclosed"
 "#;
         assert!(parse_ignore_rules(toml).is_err());
@@ -191,13 +182,11 @@ pattern = "[unclosed"
 
     #[test]
     fn test_rejects_empty_url_pattern_or_packages() {
-        assert!(parse_ignore_rules("[[nixpkgs-update.ignore]]\nurl = \"\"\n").is_err());
-        assert!(parse_ignore_rules("[[nixpkgs-update.ignore]]\npattern = \"\"\n").is_err());
+        assert!(parse_ignore_rules("[[ignore]]\nurl = \"\"\n").is_err());
+        assert!(parse_ignore_rules("[[ignore]]\npattern = \"\"\n").is_err());
         assert!(
-            parse_ignore_rules(
-                "[[nixpkgs-update.ignore]]\nurl = \"https://example.com/a.log\"\npackages = []\n"
-            )
-            .is_err()
+            parse_ignore_rules("[[ignore]]\nurl = \"https://example.com/a.log\"\npackages = []\n")
+                .is_err()
         );
     }
 }

@@ -326,7 +326,7 @@ The diff was empty after rewrites.
     fn test_analyze_log_with_rules_regex_pattern_skips() {
         let rules = crate::config::parse_ignore_rules(
             r#"
-[[nixpkgs-update.ignore]]
+[[ignore]]
 pattern = "go: go\\.mod requires go >= 1\\.\\d+"
 reason = "Allow Go version delay"
 "#,
@@ -348,7 +348,7 @@ reason = "Allow Go version delay"
     fn test_analyze_log_with_rules_url_skips_only_matching_url() {
         let rules = crate::config::parse_ignore_rules(
             r#"
-[[nixpkgs-update.ignore]]
+[[ignore]]
 url = "https://nixpkgs-update-logs.nix-community.org/fresh-editor/2026-11-10.log"
 reason = "Waiting for next run"
 "#,
