@@ -1,12 +1,31 @@
 use anyhow::Result;
 
+use crate::config::IgnoreRule;
+
 pub enum LogAnalysisResult {
     Success { pr_url: Option<String> },
     Failure,
     Skip,
 }
 
+#[cfg(test)]
 pub fn analyze_log(raw: &str, log_url: &str) -> Result<LogAnalysisResult> {
+    analyze_log_with_rules(raw, log_url, "", &[])
+}
+
+pub fn analyze_log_with_rules(
+    raw: &str,
+    log_url: &str,
+    pname: &str,
+    ignore_rules: &[IgnoreRule],
+) -> Result<LogAnalysisResult> {
+    if ignore_rules
+        .iter()
+        .any(|rule| rule.matches(pname, log_url, raw))
+    {
+        return Ok(LogAnalysisResult::Skip);
+    }
+
     if log_url.contains("/2026-07-04.log") && raw.contains("infinite recursion encountered") {
         return Ok(LogAnalysisResult::Skip);
     }
@@ -301,5 +320,58 @@ The diff was empty after rewrites.
         )
         .unwrap();
         assert!(matches!(result, LogAnalysisResult::Failure));
+    }
+
+    #[test]
+    fn test_analyze_log_with_rules_regex_pattern_skips() {
+        let rules = crate::config::parse_ignore_rules(
+            r#"
+[[nixpkgs-update.ignore]]
+pattern = "go: go\\.mod requires go >= 1\\.\\d+"
+reason = "Allow Go version delay"
+"#,
+        )
+        .unwrap();
+
+        let log = "pinact 1.0.0 -> 1.1.0\nnix build failed.\ngo: go.mod requires go >= 1.25 (running go 1.24)";
+        let result = analyze_log_with_rules(
+            log,
+            "https://nixpkgs-update-logs.nix-community.org/pinact/2026-11-10.log",
+            "pinact",
+            &rules,
+        )
+        .unwrap();
+        assert!(matches!(result, LogAnalysisResult::Skip));
+    }
+
+    #[test]
+    fn test_analyze_log_with_rules_url_skips_only_matching_url() {
+        let rules = crate::config::parse_ignore_rules(
+            r#"
+[[nixpkgs-update.ignore]]
+url = "https://nixpkgs-update-logs.nix-community.org/fresh-editor/2026-11-10.log"
+reason = "Waiting for next run"
+"#,
+        )
+        .unwrap();
+
+        let log = "nix build failed.";
+        let skipped = analyze_log_with_rules(
+            log,
+            "https://nixpkgs-update-logs.nix-community.org/fresh-editor/2026-11-10.log",
+            "fresh-editor",
+            &rules,
+        )
+        .unwrap();
+        assert!(matches!(skipped, LogAnalysisResult::Skip));
+
+        let next_run = analyze_log_with_rules(
+            log,
+            "https://nixpkgs-update-logs.nix-community.org/fresh-editor/2026-11-12.log",
+            "fresh-editor",
+            &rules,
+        )
+        .unwrap();
+        assert!(matches!(next_run, LogAnalysisResult::Failure));
     }
 }

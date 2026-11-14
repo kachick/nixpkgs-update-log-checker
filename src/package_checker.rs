@@ -2,6 +2,7 @@ use anyhow::Result;
 use ureq::Agent;
 use url::Url;
 
+use crate::config::IgnoreRule;
 use crate::log_analysis;
 
 #[derive(Debug)]
@@ -75,16 +76,21 @@ fn get_log_urls(raw_log_urls: &str, list_url: &Url) -> Result<Vec<String>> {
     Ok(log_urls)
 }
 
-pub fn check_package(agent: &Agent, pname: &str) -> Result<PackageCheckResult> {
+pub fn check_package(
+    agent: &Agent,
+    pname: &str,
+    ignore_rules: &[IgnoreRule],
+) -> Result<PackageCheckResult> {
     let base_url = Url::parse("https://nixpkgs-update-logs.nix-community.org/")
         .map_err(|e| anyhow::anyhow!("Failed to parse base URL: {e}"))?;
-    check_package_with_base_url(agent, &base_url, pname)
+    check_package_with_base_url(agent, &base_url, pname, ignore_rules)
 }
 
 fn check_package_with_base_url(
     agent: &Agent,
     base_url: &Url,
     pname: &str,
+    ignore_rules: &[IgnoreRule],
 ) -> Result<PackageCheckResult> {
     let log_list_url = base_url
         .join(&format!("{pname}/"))
@@ -115,7 +121,7 @@ fn check_package_with_base_url(
         .call()?
         .body_mut()
         .read_to_string()?;
-    match log_analysis::analyze_log(&latest_log, &latest_log_url)? {
+    match log_analysis::analyze_log_with_rules(&latest_log, &latest_log_url, pname, ignore_rules)? {
         log_analysis::LogAnalysisResult::Success { pr_url } => Ok(PackageCheckResult::Success {
             log_url: latest_log_url,
             pr_url,
@@ -208,7 +214,7 @@ mod tests {
 
         let agent = ureq::Agent::new_with_config(ureq::config::Config::default());
         let base_url = Url::parse(&format!("http://127.0.0.1:{port}/")).unwrap();
-        let result = check_package_with_base_url(&agent, &base_url, "typescript_7").unwrap();
+        let result = check_package_with_base_url(&agent, &base_url, "typescript_7", &[]).unwrap();
 
         handle.join().unwrap();
 
@@ -238,7 +244,7 @@ mod tests {
 
         let agent = ureq::Agent::new_with_config(ureq::config::Config::default());
         let base_url = Url::parse(&format!("http://127.0.0.1:{port}/")).unwrap();
-        let result = check_package_with_base_url(&agent, &base_url, "typescript_7");
+        let result = check_package_with_base_url(&agent, &base_url, "typescript_7", &[]);
 
         handle.join().unwrap();
 

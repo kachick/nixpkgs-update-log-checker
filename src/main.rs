@@ -1,11 +1,16 @@
 use anyhow::Result;
 
 mod cli;
+mod config;
 mod log_analysis;
 mod package_checker;
 
 fn main() -> Result<()> {
     let cli = cli::parse_cli_args()?;
+    let ignore_rules = match &cli.config {
+        Some(path) => config::load_ignore_rules(path)?,
+        None => Vec::new(),
+    };
     let config = ureq::config::Config::default();
     let agent = ureq::Agent::new_with_config(config);
 
@@ -13,7 +18,7 @@ fn main() -> Result<()> {
         let handles: Vec<_> = cli
             .packages
             .iter()
-            .map(|pkg| s.spawn(|| package_checker::check_package(&agent, pkg)))
+            .map(|pkg| s.spawn(|| package_checker::check_package(&agent, pkg, &ignore_rules)))
             .collect();
 
         handles

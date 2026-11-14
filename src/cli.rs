@@ -1,4 +1,5 @@
 use clap::Parser;
+use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
 #[command(version)]
@@ -17,6 +18,12 @@ pub struct Cli {
         help = "Exit with failure if any warning is encountered"
     )]
     pub fail_on_warning: bool,
+
+    #[arg(
+        long = "config",
+        help = "Path to a TOML configuration file with ignore rules"
+    )]
+    pub config: Option<PathBuf>,
 }
 
 pub fn parse_cli_args() -> anyhow::Result<Cli> {
@@ -45,5 +52,20 @@ mod tests {
         .unwrap();
         assert_eq!(cli.packages, vec!["dprint"]);
         assert!(cli.fail_on_warning);
+        assert!(cli.config.is_none());
+    }
+
+    #[test]
+    fn test_parse_cli_args_with_config() {
+        let cli = Cli::try_parse_from([
+            "nixpkgs-update-log-checker",
+            "-p",
+            "dprint",
+            "--config",
+            "config.toml",
+        ])
+        .unwrap();
+        assert_eq!(cli.packages, vec!["dprint"]);
+        assert_eq!(cli.config, Some(PathBuf::from("config.toml")));
     }
 }
