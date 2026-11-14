@@ -66,10 +66,10 @@ pub fn analyze_log_with_rules(
 
     let keywords = [
         "Packages updated!",
-        "There might already be an open PR for this update:", // https://nixpkgs-update-logs.nix-community.org/tlrc/2025-03-17.log
-        "An auto update branch exists with an equal or greater version", // https://nixpkgs-update-logs.nix-community.org/podman/2025-04-22.log,
-        "No auto update branch exists", // https://nixpkgs-update-logs.nix-community.org/treefmt/2025-04-11.log
-        "Do not update GNOME during a release cycle", // https://nixpkgs-update-logs.nix-community.org/loupe/2025-04-15.log
+        "There might already be an open PR for this update:", // https://nixpkgs-update-logs.nixos.org/tlrc/2025-03-17.log
+        "An auto update branch exists with an equal or greater version", // https://nixpkgs-update-logs.nixos.org/podman/2025-04-22.log,
+        "No auto update branch exists", // https://nixpkgs-update-logs.nixos.org/treefmt/2025-04-11.log
+        "Do not update GNOME during a release cycle", // https://nixpkgs-update-logs.nixos.org/loupe/2025-04-15.log
     ];
     if keywords.iter().any(|&keyword| raw.contains(keyword)) {
         return Ok(LogAnalysisResult::Success { pr_url: None });
@@ -84,7 +84,7 @@ mod tests {
 
     #[test]
     fn test_analyze_log_success_with_pr() {
-        // Extracted from https://nixpkgs-update-logs.nix-community.org/dprint/2025-03-24.log
+        // Extracted from https://nixpkgs-update-logs.nixos.org/dprint/2025-03-24.log
         let log = r#"- dprint-0.49.0: UPDATING ...
  - dprint-0.49.0: DONE.
 
@@ -106,7 +106,7 @@ Diff after rewrites:
 https://api.github.com/repos/NixOS/nixpkgs/pulls/392589"#;
         let result = analyze_log(
             log,
-            "https://nixpkgs-update-logs.nix-community.org/dprint/2025-03-24.log",
+            "https://nixpkgs-update-logs.nixos.org/dprint/2025-03-24.log",
         )
         .unwrap();
         match result {
@@ -122,7 +122,7 @@ https://api.github.com/repos/NixOS/nixpkgs/pulls/392589"#;
 
     #[test]
     fn test_analyze_log_success_with_pr_for_font() {
-        // Extracted from https://nixpkgs-update-logs.nix-community.org/plemoljp/2025-04-02.log
+        // Extracted from https://nixpkgs-update-logs.nixos.org/plemoljp/2025-04-02.log
         // Which does not have "Packages updated!" in the log
         let log = r#"plemoljp 2.0.3 -> 2.0.4 https://github.com/yuru7/PlemolJP/releases
 
@@ -130,7 +130,7 @@ https://api.github.com/repos/NixOS/nixpkgs/pulls/392589"#;
 https://api.github.com/repos/NixOS/nixpkgs/pulls/395562"#;
         let result = analyze_log(
             log,
-            "https://nixpkgs-update-logs.nix-community.org/plemoljp/2025-04-02.log",
+            "https://nixpkgs-update-logs.nixos.org/plemoljp/2025-04-02.log",
         )
         .unwrap();
         match result {
@@ -146,7 +146,7 @@ https://api.github.com/repos/NixOS/nixpkgs/pulls/395562"#;
 
     #[test]
     fn test_analyze_log_success_but_no_pr() {
-        // Extracted from https://nixpkgs-update-logs.nix-community.org/dprint/2025-04-13.log
+        // Extracted from https://nixpkgs-update-logs.nixos.org/dprint/2025-04-13.log
         let log = "dprint 0 -> 1
 attrpath: dprint
 Checking auto update branch...
@@ -162,7 +162,7 @@ Packages updated!
 The diff was empty after rewrites.";
         let result = analyze_log(
             log,
-            "https://nixpkgs-update-logs.nix-community.org/dprint/2025-04-13.log",
+            "https://nixpkgs-update-logs.nixos.org/dprint/2025-04-13.log",
         )
         .unwrap();
         match result {
@@ -175,11 +175,11 @@ The diff was empty after rewrites.";
 
     #[test]
     fn test_analyze_log_failure_with_no_success() {
-        // Extracted from https://nixpkgs-update-logs.nix-community.org/fishnet/2025-04-10.log
+        // Extracted from https://nixpkgs-update-logs.nixos.org/fishnet/2025-04-10.log
         let log = "fishnet 2.9.4 -> 2.9.5 https://github.com/lichess-org/fishnet/releases";
         let result = analyze_log(
             log,
-            "https://nixpkgs-update-logs.nix-community.org/fishnet/2025-04-10.log",
+            "https://nixpkgs-update-logs.nixos.org/fishnet/2025-04-10.log",
         )
         .unwrap();
         assert!(matches!(result, LogAnalysisResult::Failure));
@@ -187,7 +187,7 @@ The diff was empty after rewrites.";
 
     #[test]
     fn test_analyze_log_failure_with_clarified_build_failed() {
-        // Extracted from https://nixpkgs-update-logs.nix-community.org/chawan/2025-05-04.log
+        // Extracted from https://nixpkgs-update-logs.nixos.org/chawan/2025-05-04.log
         let log = r#"Enqueuing group of 1 packages
  - chawan-0-unstable-2025-04-18: UPDATING ...
  - chawan-0-unstable-2025-04-18: DONE.
@@ -202,7 +202,7 @@ nix build failed.
 [01m[Kgcc:[m[K [01;31m[Kerror: [m[Kthe: linker input file not found: No such file or directory"#;
         let result = analyze_log(
             log,
-            "https://nixpkgs-update-logs.nix-community.org/chawan/2025-05-04.log",
+            "https://nixpkgs-update-logs.nixos.org/chawan/2025-05-04.log",
         )
         .unwrap();
         assert!(matches!(result, LogAnalysisResult::Failure));
@@ -210,7 +210,7 @@ nix build failed.
 
     #[test]
     fn test_analyze_log_ending_failed_prefers_skip() {
-        // Extracted from https://nixpkgs-update-logs.nix-community.org/dbeaver/2024-05-16.log
+        // Extracted from https://nixpkgs-update-logs.nixos.org/dbeaver/2024-05-16.log
         let log = r#"dbeaver 22.2.2 -> 24.0.4 https://github.com/dbeaver/dbeaver/releases
 attrpath: dbeaver
 Checking auto update branch...
@@ -223,7 +223,7 @@ error: build log of 'dbeaver' is not available
 "#;
         let result = analyze_log(
             log,
-            "https://nixpkgs-update-logs.nix-community.org/dbeaver/2024-05-16.log",
+            "https://nixpkgs-update-logs.nixos.org/dbeaver/2024-05-16.log",
         )
         .unwrap();
         assert!(matches!(result, LogAnalysisResult::Failure));
@@ -231,7 +231,7 @@ error: build log of 'dbeaver' is not available
 
     #[test]
     fn test_analyze_log_no_updater() {
-        // https://nixpkgs-update-logs.nix-community.org/stockfish/2025-05-13.log
+        // https://nixpkgs-update-logs.nixos.org/stockfish/2025-05-13.log
         let log = r#"stockfish 17 -> 17.1 https://repology.org/project/stockfish/versions
 attrpath: stockfish
 Checking auto update branch...
@@ -250,7 +250,7 @@ The diff was empty after rewrites.
 "#;
         let result = analyze_log(
             log,
-            "https://nixpkgs-update-logs.nix-community.org/stockfish/2025-05-13.log",
+            "https://nixpkgs-update-logs.nixos.org/stockfish/2025-05-13.log",
         )
         .unwrap();
         assert!(matches!(result, LogAnalysisResult::Skip));
@@ -261,7 +261,7 @@ The diff was empty after rewrites.
         let log = include_str!("../tests/fixtures/betterleaks-2026-07-04.log");
         let result = analyze_log(
             log,
-            "https://nixpkgs-update-logs.nix-community.org/betterleaks/2026-07-04.log",
+            "https://nixpkgs-update-logs.nixos.org/betterleaks/2026-07-04.log",
         )
         .unwrap();
         assert!(matches!(result, LogAnalysisResult::Skip));
@@ -272,7 +272,7 @@ The diff was empty after rewrites.
         let log = include_str!("../tests/fixtures/brush-2026-07-04.log");
         let result = analyze_log(
             log,
-            "https://nixpkgs-update-logs.nix-community.org/brush/2026-07-04.log",
+            "https://nixpkgs-update-logs.nixos.org/brush/2026-07-04.log",
         )
         .unwrap();
         assert!(matches!(result, LogAnalysisResult::Skip));
@@ -283,7 +283,7 @@ The diff was empty after rewrites.
         let log = include_str!("../tests/fixtures/typescript-go-2026-07-04.log");
         let result = analyze_log(
             log,
-            "https://nixpkgs-update-logs.nix-community.org/typescript-go/2026-07-04.log",
+            "https://nixpkgs-update-logs.nixos.org/typescript-go/2026-07-04.log",
         )
         .unwrap();
         assert!(matches!(result, LogAnalysisResult::Skip));
@@ -294,7 +294,7 @@ The diff was empty after rewrites.
         let log = include_str!("../tests/fixtures/betterleaks-2026-07-04.log");
         let result = analyze_log(
             log,
-            "https://nixpkgs-update-logs.nix-community.org/betterleaks/2026-07-05.log",
+            "https://nixpkgs-update-logs.nixos.org/betterleaks/2026-07-05.log",
         )
         .unwrap();
         assert!(matches!(result, LogAnalysisResult::Failure));

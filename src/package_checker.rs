@@ -142,9 +142,9 @@ mod tests {
 
     #[test]
     fn test_get_log_urls() {
-        let list_url = Url::parse("https://nixpkgs-update-logs.nix-community.org/dprint/").unwrap();
+        let list_url = Url::parse("https://nixpkgs-update-logs.nixos.org/dprint/").unwrap();
 
-        // Extracted from view-source:https://nixpkgs-update-logs.nix-community.org/dprint/
+        // Extracted from view-source:https://nixpkgs-update-logs.nixos.org/dprint/
         let raw_log_urls = r#"
         <html>
         <head><title>Index of /dprint/</title></head>
@@ -183,8 +183,8 @@ mod tests {
         let result = get_log_urls(raw_log_urls, &list_url).unwrap();
         let sample = result[..=1].to_vec();
         let expected = vec![
-            "https://nixpkgs-update-logs.nix-community.org/dprint/2025-04-13.log".to_string(),
-            "https://nixpkgs-update-logs.nix-community.org/dprint/2025-04-04.log".to_string(),
+            "https://nixpkgs-update-logs.nixos.org/dprint/2025-04-13.log".to_string(),
+            "https://nixpkgs-update-logs.nixos.org/dprint/2025-04-04.log".to_string(),
         ];
 
         assert_eq!(sample, expected);
