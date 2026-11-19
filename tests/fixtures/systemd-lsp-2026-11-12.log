@@ -1,0 +1,122 @@
+Running nixpkgs-update (https://github.com/NixOS/infra/blob/main/non-critical-infra/modules/nixpkgs-update/README.md) with UPDATE_INFO: systemd-lsp 0.2.1-2026.09.28 -> 2026.11.02 https://github.com/JFryy/systemd-lsp/releases
+attrpath: systemd-lsp
+Checking auto update branch...
+[version] 
+[version] generic version rewriter does not support multiple hashes
+[rustCrateVersion] 
+[rustCrateVersion] skipping because derivation has updateScript
+[golangModuleVersion] 
+[golangModuleVersion] Not a buildGoModule package with vendorHash
+[npmDepsVersion] 
+[npmDepsVersion] No npmDepsHash
+[updateScript] 
+[updateScript] Success
+[updateScript] these 2 derivations will be built:
+  /nix/store/nsnz4hd0g591gfrgsj2a2fsb6vaaa74b-systemd-lsp-update-script.drv
+  /nix/store/lmb3w216x9gll6cxr9h4j9sm55g3y0nl-packages.json.drv
+building '/nix/store/nsnz4hd0g591gfrgsj2a2fsb6vaaa74b-systemd-lsp-update-script.drv'...
+building '/nix/store/lmb3w216x9gll6cxr9h4j9sm55g3y0nl-packages.json.drv'...
+
+Going to be running update for following packages:
+ - systemd-lsp-0.2.1-2026.09.28
+
+Press Enter key to continue...
+Running update for:
+Enqueuing group of 1 packages
+ - systemd-lsp-0.2.1-2026.09.28: UPDATING ...
+ - systemd-lsp-0.2.1-2026.09.28: DONE.
+
+Packages updated!
+
+Diff after rewrites:
+diff --git a/pkgs/by-name/sy/systemd-lsp/package.nix b/pkgs/by-name/sy/systemd-lsp/package.nix
+index 3782690e920f..c99dfa39f105 100644
+--- a/pkgs/by-name/sy/systemd-lsp/package.nix
++++ b/pkgs/by-name/sy/systemd-lsp/package.nix
+@@ -13,7 +13,7 @@
+ 
+ let
+   crateVersion = "0.2.1";
+-  releaseDate = "2026.09.28";
++  releaseDate = "2026.11.02";
+ in
+ rustPlatform.buildRustPackage (finalAttrs: {
+   pname = "systemd-lsp";
+@@ -25,7 +25,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
+     owner = "JFryy";
+     repo = "systemd-lsp";
+     tag = "v${releaseDate}";
+-    hash = "sha256-ATzepUemul9vWfHFCCAH2yHrhNjsBzTqsjJB2dLi3vE=";
++    hash = "sha256-NMMTHBl6ZQstR+Lh/lSJEQunvvKngOA148LwFbqms/4=";
+   };
+ 
+   cargoHash = "sha256-qajr9g7l9Nix9JLZg9yGWx8kn8xAuGC9Yo2Q+4dAS/M=";
+
+No auto update branch exists
+Old version 0.2.1-2026.09.28" not present in master derivation file with contents: {
+  lib,
+  fetchFromGitHub,
+  rustPlatform,
+  versionCheckHook,
+  writeShellApplication,
+  curl,
+  yq-go,
+  common-updater-scripts,
+  nix,
+  nix-update,
+}:
+
+let
+  crateVersion = "0.2.1";
+  releaseDate = "2026.09.28";
+in
+rustPlatform.buildRustPackage (finalAttrs: {
+  pname = "systemd-lsp";
+  version = "${crateVersion}-${releaseDate}";
+
+  __structuredAttrs = true;
+
+  src = fetchFromGitHub {
+    owner = "JFryy";
+    repo = "systemd-lsp";
+    tag = "v${releaseDate}";
+    hash = "sha256-ATzepUemul9vWfHFCCAH2yHrhNjsBzTqsjJB2dLi3vE=";
+  };
+
+  cargoHash = "sha256-qajr9g7l9Nix9JLZg9yGWx8kn8xAuGC9Yo2Q+4dAS/M=";
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [
+    versionCheckHook
+  ];
+  preVersionCheck = ''
+    version=${crateVersion}
+  '';
+
+  passthru = {
+    inherit crateVersion releaseDate;
+
+    updateScript = lib.getExe (writeShellApplication {
+      name = "${finalAttrs.pname}-update-script";
+      runtimeInputs = [
+        curl
+        yq-go
+        common-updater-scripts
+        nix
+        nix-update
+      ];
+      text = builtins.readFile ./update.bash;
+    });
+  };
+
+  meta = {
+    description = "Language server implementation for systemd unit files made in Rust";
+    homepage = "https://github.com/JFryy/systemd-lsp";
+    changelog = "https://github.com/JFryy/systemd-lsp/releases/tag/${finalAttrs.src.tag}";
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ mahyarmirrashed ];
+    mainProgram = "systemd-lsp";
+    platforms = with lib.platforms; unix ++ windows;
+  };
+})
+

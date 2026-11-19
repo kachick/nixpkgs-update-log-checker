@@ -44,6 +44,12 @@ pub fn analyze_log_with_rules(
         return Ok(LogAnalysisResult::Failure);
     }
 
+    // `assertNotUpdatedOn` runs after rewrites for `updateScript` packages, and
+    // dumps the derivation file inline without an `error:` prefix.
+    if lines.contains(&"Diff after rewrites:") && has_missing_old_version_error(&lines) {
+        return Ok(LogAnalysisResult::Failure);
+    }
+
     if let Some(last_line) = lines.last() {
         if last_line.starts_with("error") {
             return Ok(LogAnalysisResult::Failure);
@@ -76,6 +82,14 @@ pub fn analyze_log_with_rules(
     }
 
     Ok(LogAnalysisResult::Failure)
+}
+
+fn has_missing_old_version_error(lines: &[&str]) -> bool {
+    lines.iter().any(|line| {
+        line.starts_with("Old version ")
+            && line.contains(" not present in ")
+            && line.contains(" derivation file with contents:")
+    })
 }
 
 #[cfg(test)]
@@ -395,5 +409,30 @@ reason = "Allow Go version delay"
         )
         .unwrap();
         assert!(matches!(result, LogAnalysisResult::Skip));
+    }
+
+    #[test]
+    fn test_analyze_log_computed_version_failure_systemd_lsp() {
+        let log = include_str!("../tests/fixtures/systemd-lsp-2026-11-12.log");
+        let result = analyze_log(
+            log,
+            "https://nixpkgs-update-logs.nixos.org/systemd-lsp/2026-11-12.log",
+        )
+        .unwrap();
+        assert!(matches!(result, LogAnalysisResult::Failure));
+    }
+
+    #[test]
+    fn test_analyze_log_already_updated_on_master_treefmt() {
+        let log = include_str!("../tests/fixtures/treefmt-2026-02-28.log");
+        let result = analyze_log(
+            log,
+            "https://nixpkgs-update-logs.nixos.org/treefmt/2026-02-28.log",
+        )
+        .unwrap();
+        assert!(matches!(
+            result,
+            LogAnalysisResult::Success { pr_url: None }
+        ));
     }
 }
