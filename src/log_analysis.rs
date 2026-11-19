@@ -44,12 +44,6 @@ pub fn analyze_log_with_rules(
         return Ok(LogAnalysisResult::Failure);
     }
 
-    // `assertNotUpdatedOn` runs after rewrites for `updateScript` packages, and
-    // dumps the derivation file inline without an `error:` prefix.
-    if lines.contains(&"Diff after rewrites:") && has_missing_old_version_error(&lines) {
-        return Ok(LogAnalysisResult::Failure);
-    }
-
     if let Some(last_line) = lines.last() {
         if last_line.starts_with("error") {
             return Ok(LogAnalysisResult::Failure);
@@ -70,11 +64,24 @@ pub fn analyze_log_with_rules(
         return Ok(LogAnalysisResult::Skip);
     }
 
+    // Pre-rewrite version mismatches usually mean master or staging already
+    // updated ahead of Repology or the release feed.
+    if !lines.contains(&"Diff after rewrites:") && has_missing_old_version_error(&lines) {
+        return Ok(LogAnalysisResult::Success { pr_url: None });
+    }
+
+    // Match terminal AS-IS outcomes rather than mid-run progress lines like
+    // "Packages updated!" or "No auto update branch exists", which also appear
+    // in logs that fail in later steps.
     let keywords = [
-        "Packages updated!",
+        "The diff was empty after rewrites.",
+        "Package version did not change.",
+        "Hashes equal; no update necessary",
+        "Source url did not change.",
+        "rev equal; no update necessary",
+        "No rewrites performed on derivation.",
         "There might already be an open PR for this update:", // https://nixpkgs-update-logs.nixos.org/tlrc/2025-03-17.log
         "An auto update branch exists with an equal or greater version", // https://nixpkgs-update-logs.nixos.org/podman/2025-04-22.log,
-        "No auto update branch exists", // https://nixpkgs-update-logs.nixos.org/treefmt/2025-04-11.log
         "Do not update GNOME during a release cycle", // https://nixpkgs-update-logs.nixos.org/loupe/2025-04-15.log
     ];
     if keywords.iter().any(|&keyword| raw.contains(keyword)) {
@@ -434,5 +441,29 @@ reason = "Allow Go version delay"
             result,
             LogAnalysisResult::Success { pr_url: None }
         ));
+    }
+
+    #[test]
+    fn test_analyze_log_post_rewrite_failure_not_masked_by_progress_lines() {
+        let log = r#"foo 1.0 -> 1.1
+attrpath: foo
+Checking auto update branch...
+[updateScript]
+[updateScript] Success
+
+Packages updated!
+
+Diff after rewrites:
+--- a/pkgs/by-name/fo/foo/package.nix
++++ b/pkgs/by-name/fo/foo/package.nix
+
+No auto update branch exists
+Update edits cause no rebuilds."#;
+        let result = analyze_log(
+            log,
+            "https://nixpkgs-update-logs.nixos.org/foo/2026-11-12.log",
+        )
+        .unwrap();
+        assert!(matches!(result, LogAnalysisResult::Failure));
     }
 }
